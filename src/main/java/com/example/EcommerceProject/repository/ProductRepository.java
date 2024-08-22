@@ -1,0 +1,24 @@
+package com.example.EcommerceProject.repository;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.example.EcommerceProject.modelEntity.ProductEntity;
+
+public interface ProductRepository extends JpaRepository<ProductEntity, Integer>{
+	
+	@Query(value="select current_timestamp",nativeQuery=true)
+	Timestamp findCurrentTimeStamp();
+	
+	@Query("SELECT pe From ProductEntity pe WHERE pe.productName = ?1")
+    ProductEntity findByproductName(String productName);
+	
+//	@Query("SELECT pe From ProductEntity pe WHERE pe.productId IN (?1)")
+	//List<ProductEntity> findAllByproductId(List<Integer> productId);
+ 
+    
+}
+
