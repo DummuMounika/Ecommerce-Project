@@ -1,12 +1,14 @@
 package com.example.EcommerceProject.modelEntity;
 
 import java.sql.Timestamp;
-import com.example.EcommerceProject.utils.JsonTimestampSerializer;
 
+import com.example.EcommerceProject.utils.JsonTimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,11 +37,11 @@ public class ProductEntity {
 	@Column(name = "product_stock_quantity")
 	private int productStockQuantity;
 	
-	@Column
-	private int category_id;
-	
-	@Column
-	private int unit_id;
+	@Column(name = "category_id")
+	private int categoryId;
+
+	@Column(name = "unit_id")
+	private int unitId;
 	
 	@Column
 	private String product_image_url;
@@ -53,12 +55,11 @@ public class ProductEntity {
     private Timestamp product_updated_time;
 	
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id", insertable = false, updatable = false)
 	private CategoryEntity category;
 	
-	@ManyToOne
-	//@JoinColumn(name = "unit_Id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "unit_id", insertable = false, updatable = false)
 	private UnitEntity unitEntity;
 	
@@ -94,16 +95,16 @@ public class ProductEntity {
 		this.productStockQuantity = productStockQuantity;
 	}
 	public int getCategory_id() {
-		return category_id;
+		return categoryId;
 	}
-	public void setCategory_id(int category_id) {
-		this.category_id = category_id;
+	public void setCategory_id(int categoryId) {
+		this.categoryId = categoryId;
 	}
 	public int getUnit_id() {
-		return unit_id;
+		return unitId;
 	}
-	public void setUnit_id(int unit_id) {
-		this.unit_id = unit_id;
+	public void setUnit_id(int unitId) {
+		this.unitId = unitId;
 	}
 	public String getProduct_image_url() {
 		return product_image_url;
@@ -139,7 +140,7 @@ public class ProductEntity {
 	public String toString() {
 		return "Product [productId=" + productId + ", product_name=" + productName + ", product_description="
 				+ product_description + ", productPrice=" + productPrice + ", productStockQuantity="
-				+ productStockQuantity + ", category_id=" + category_id + ", unit_id=" + unit_id
+				+ productStockQuantity + ", category_id=" + categoryId + ", unit_id=" + unitId
 				+ ", product_image_url=" + product_image_url + ", product_created_time=" + product_created_time
 				+ ", product_updated_time=" + product_updated_time + "]";
 	}
@@ -152,8 +153,8 @@ public class ProductEntity {
 		this.product_description = product_description;
 		this.productPrice = productPrice;
 		this.productStockQuantity = productStockQuantity;
-		this.category_id = category_id;
-		this.unit_id = unit_id;
+		this.categoryId = category_id;
+		this.unitId = unit_id;
 		this.product_image_url = product_image_url;
 		
 		

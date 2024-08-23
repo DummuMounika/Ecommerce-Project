@@ -15,9 +15,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 	
 	@Query("SELECT pe From ProductEntity pe WHERE pe.productName = ?1")
     ProductEntity findByproductName(String productName);
-	
-//	@Query("SELECT pe From ProductEntity pe WHERE pe.productId IN (?1)")
-	//List<ProductEntity> findAllByproductId(List<Integer> productId);
  
     
 }

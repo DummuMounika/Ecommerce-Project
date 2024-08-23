@@ -13,45 +13,80 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.example.EcommerceProject.exceptions.NotFoundException;
 import com.example.EcommerceProject.model.Unit;
 import com.example.EcommerceProject.services.UnitService;
 
 @RestController
 public class UnitController {
-	
+
 	@Autowired
 	private UnitService unitService;
-	
+
+	/**
+	 * This function help us to retrieve Units
+	 * 
+	 * @return {@link List} of Unitt {@link Unit}
+	 */
 	@GetMapping("/public/units")
 	public ResponseEntity<List<Unit>> getAllUnitDetails() {
 		List<Unit> units = unitService.getAllUnits();
 		return new ResponseEntity<>(units, HttpStatus.OK);
 	}
-	
-	@GetMapping("/public/units/{unit_Id}")
-	public ResponseEntity<Unit> getSingleUnitDetail(@PathVariable Integer unit_Id) {
-		Unit unit = unitService.getUnit(unit_Id);
-		    return new ResponseEntity<>(unit, HttpStatus.OK);
-	}
-	
-	@GetMapping("/public/unitByFilters")
-	public ResponseEntity<Unit> getSingleUnitByFilters(
-			@RequestParam(required = true,value="unitname",defaultValue = "monu") String unit_name,
-			@RequestParam(required = true,value="unitabbreviation",defaultValue="dummu") String unit_abbreviation) {
-		System.out.println("Checking the req parameter: "+ unit_name +" " + unit_abbreviation);
-		Unit unit = unitService.findUnitByFilters(unit_name, unit_abbreviation);
+
+	/**
+	 * This function help us to retrieve unit
+	 * 
+	 * @return Unit {@link Unit}
+	 */
+	@GetMapping("/public/units/{unitId}")
+	public ResponseEntity<Unit> getSingleUnitDetail(@PathVariable Integer unitId) {
+		Unit unit = unitService.getSingleUnit(unitId);
 		return new ResponseEntity<>(unit, HttpStatus.OK);
 	}
-	
-	@GetMapping("/public/unitsByName/{unit_name}")
-	public ResponseEntity<Integer> getUnitName(@PathVariable String unit_name) {
-		int unitId = unitService.findUnitId(unit_name);
-		return new ResponseEntity<>(unitId, HttpStatus.OK);	
-	}
-	
 
+	/**
+	 * This function help us to get unit by filters
+	 * 
+	 * @param unit name and unit abbreviation
+	 * @return {@link Unit}
+	 */
+	@GetMapping("/public/unitByFilters")
+	public ResponseEntity<Unit> getSingleUnitByFilters(
+			@RequestParam(required = true,value="unitname",defaultValue = "monu") String unitName,
+			@RequestParam(required = true,value="unitabbreviation",defaultValue="dummu") String unitAbbreviation) {
+		System.out.println("Checking the req parameter: "+ unitName +" " + unitAbbreviation);
+		try {
+			Unit unit = unitService.findUnitByFilters(unitName, unitAbbreviation);
+			return new ResponseEntity<>(unit, HttpStatus.OK);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * This function help us to get unit name
+	 * 
+	 * @param unit Id
+	 * @return Integer
+	 */
+	@GetMapping("/public/unitsByName/{unitName}")
+	public ResponseEntity<Integer> getUnitName(@PathVariable String unitName) {	
+		try {
+			int unitId = unitService.findUnitId(unitName);
+			return new ResponseEntity<>(unitId, HttpStatus.OK);	
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * This function help us to create units
+	 * 
+	 * @param {@link Unit}
+	 * @return String (confirmation message)
+	 */
 	@PostMapping("/public/units")
 	public ResponseEntity<String> createUnit(@RequestBody Unit unit) {
 		boolean isCreated = unitService.createUnit(unit);
@@ -60,29 +95,40 @@ public class UnitController {
 		}else {
 			return new ResponseEntity<>("Failed to add new unit", HttpStatus.BAD_REQUEST);
 		}
-		
+
 	}
-	
-	@DeleteMapping("/public/units/{unit_Id}")
-	public ResponseEntity<String> deleteUnitDetail(@PathVariable Integer unit_Id) {
+
+	/**
+	 * This function help us to delete unit
+	 * 
+	 * @param unit Id
+	 * @return String (confirmation message)
+	 */
+	@DeleteMapping("/public/units/{unitId}")
+	public ResponseEntity<String> deleteUnitDetail(@PathVariable Integer unitId) {
 		try {
-			String unitStatus = unitService.deleteUnit(unit_Id);
-		    return new ResponseEntity<>(unitStatus, HttpStatus.OK);
-		} catch (ResponseStatusException e) {
-			return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+			String unitStatus = unitService.deleteUnit(unitId);
+			return new ResponseEntity<>(unitStatus, HttpStatus.OK);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
-		
+
 	}
-	
-	@PutMapping("/public/units/{unit_Id}")
-	public ResponseEntity<String> updateUnitDetail(@RequestBody Unit unit, @PathVariable Integer unit_Id) {
+
+	/**
+	 * This function help us to update units
+	 * @param unit Id
+	 * @return String (confirmation message)
+	 */
+	@PutMapping("/public/units/{unitId}")
+	public ResponseEntity<String> updateUnitDetail(@RequestBody Unit unit, @PathVariable Integer unitId) {
 		try {
-			Unit savedUnit = unitService.updateUnit(unit, unit_Id);
-			return new ResponseEntity<>("Unit Detail with: " + unit_Id + " updated successfully",HttpStatus.OK);
-		} catch (ResponseStatusException e) {
-			return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+			unitService.updateUnit(unit, unitId);
+			return new ResponseEntity<>("Unit Detail with: " + unitId + " updated successfully",HttpStatus.OK);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
-		
+
 	}
 
 }
