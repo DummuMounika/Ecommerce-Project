@@ -1,6 +1,7 @@
 package com.example.EcommerceProject.controllers;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,16 @@ import com.example.EcommerceProject.services.UnitService;
 @RestController
 public class UnitController {
 
-	@Autowired
+	
 	private UnitService unitService;
+	
+	Logger logger = Logger.getLogger(getClass().getName());
+	
+	@Autowired
+	public UnitController(UnitService unitService) {
+		super();
+		this.unitService = unitService;
+	}
 
 	/**
 	 * This function help us to retrieve Units
@@ -56,7 +65,6 @@ public class UnitController {
 	public ResponseEntity<Unit> getSingleUnitByFilters(
 			@RequestParam(required = true,value="unitname",defaultValue = "monu") String unitName,
 			@RequestParam(required = true,value="unitabbreviation",defaultValue="dummu") String unitAbbreviation) {
-		System.out.println("Checking the req parameter: "+ unitName +" " + unitAbbreviation);
 		try {
 			Unit unit = unitService.findUnitByFilters(unitName, unitAbbreviation);
 			return new ResponseEntity<>(unit, HttpStatus.OK);

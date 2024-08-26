@@ -37,8 +37,8 @@ public class CartProduct {
 	public double getProductUnitPrice() {
 		return productUnitPrice;
 	}
-	public void setProductUnitPrice(double product_unitPrice) {
-		this.productUnitPrice = product_unitPrice;
+	public void setProductUnitPrice(double productUnitPrice) {
+		this.productUnitPrice = productUnitPrice;
 	}
 	public boolean isProductReadyToCheckOut() {
 		return isProductReadyToCheckOut;
@@ -63,15 +63,12 @@ public class CartProduct {
 	
 	
 	
-	public CartProduct(int product_id, String product_name, double product_price, int product_quantity) {
+	public CartProduct(int productId, String productName, double productPrice, int productQuantity) {
 		super();
-		this.productId = product_id;
-		this.productName = product_name;
-		this.productOriginalPrice = product_price;
-		this.productQuantity = product_quantity;
-		//this.product_unitPrice = product_unitPrice;
-		//this.isProductReadyToCheckOut = isProductReadyToCheckOut;
-		//this.errorMessage = errorMessage;
+		this.productId = productId;
+		this.productName = productName;
+		this.productOriginalPrice = productPrice;
+		this.productQuantity = productQuantity;
 	}
 	
 	public CartProduct() {

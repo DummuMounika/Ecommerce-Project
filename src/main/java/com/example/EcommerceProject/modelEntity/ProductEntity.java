@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import com.example.EcommerceProject.utils.JsonTimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,7 +28,7 @@ public class ProductEntity {
 	private String productName;
 	
 	@Column
-	private String product_description;
+	private String productDescription;
 	
 	@Column(name ="product_price")
 	private double productPrice;
@@ -44,15 +43,15 @@ public class ProductEntity {
 	private int unitId;
 	
 	@Column
-	private String product_image_url;
+	private String productImageUrl;
 	
 	@Column
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp product_created_time;
+    private Timestamp productCreatedTime;
 	
 	@Column
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp product_updated_time;
+    private Timestamp productUpdatedTime;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -70,59 +69,59 @@ public class ProductEntity {
 	public void setProductId(int productId) {
 		this.productId = productId;
 	}
-	public String getProduct_name() {
+	public String getProductName() {
 		return productName;
 	}
-	public void setProduct_name(String product_name) {
-		this.productName = product_name;
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
-	public String getProduct_description() {
-		return product_description;
+	public String getProductDescription() {
+		return productDescription;
 	}
-	public void setProduct_description(String product_description) {
-		this.product_description = product_description;
+	public void setProductDescription(String productDescription) {
+		this.productDescription = productDescription;
 	}
-	public double getProduct_price() {
+	public double getProductPrice() {
 		return productPrice;
 	}
-	public void setProduct_price(double productPrice) {
+	public void setProductPrice(double productPrice) {
 		this.productPrice = productPrice;
 	}
-	public int getProduct_stock_quantity() {
+	public int getProductStockQuantity() {
 		return productStockQuantity;
 	}
-	public void setProduct_stock_quantity(int productStockQuantity) {
+	public void setProductStockQuantity(int productStockQuantity) {
 		this.productStockQuantity = productStockQuantity;
 	}
-	public int getCategory_id() {
+	public int getCategoryId() {
 		return categoryId;
 	}
-	public void setCategory_id(int categoryId) {
+	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
 	}
-	public int getUnit_id() {
+	public int getUnitId() {
 		return unitId;
 	}
-	public void setUnit_id(int unitId) {
+	public void setUnitId(int unitId) {
 		this.unitId = unitId;
 	}
-	public String getProduct_image_url() {
-		return product_image_url;
+	public String getProductImageUrl() {
+		return productImageUrl;
 	}
-	public void setProduct_image_url(String product_image_url) {
-		this.product_image_url = product_image_url;
+	public void setProductImageUrl(String productImageUrl) {
+		this.productImageUrl = productImageUrl;
 	}
-	public Timestamp getProduct_created_time() {
-		return product_created_time;
+	public Timestamp getProductCreatedTime() {
+		return productCreatedTime;
 	}
-	public void setProduct_created_time(Timestamp product_created_time) {
-		this.product_created_time = product_created_time;
+	public void setProductCreatedTime(Timestamp productCreatedTime) {
+		this.productCreatedTime = productCreatedTime;
 	}
-	public Timestamp getProduct_updated_time() {
-		return product_updated_time;
+	public Timestamp getProductUpdatedTime() {
+		return productUpdatedTime;
 	}
-	public void setProduct_updated_time(Timestamp product_updated_time) {
-		this.product_updated_time = product_updated_time;
+	public void setProductUpdatedTime(Timestamp productUpdatedTime) {
+		this.productUpdatedTime = productUpdatedTime;
 	}
 	public CategoryEntity getCategoryEntity() {
 		return category;
@@ -139,23 +138,23 @@ public class ProductEntity {
 	@Override
 	public String toString() {
 		return "Product [productId=" + productId + ", product_name=" + productName + ", product_description="
-				+ product_description + ", productPrice=" + productPrice + ", productStockQuantity="
+				+ productDescription + ", productPrice=" + productPrice + ", productStockQuantity="
 				+ productStockQuantity + ", category_id=" + categoryId + ", unit_id=" + unitId
-				+ ", product_image_url=" + product_image_url + ", product_created_time=" + product_created_time
-				+ ", product_updated_time=" + product_updated_time + "]";
+				+ ", product_image_url=" + productImageUrl + ", product_created_time=" + productCreatedTime
+				+ ", product_updated_time=" + productUpdatedTime + "]";
 	}
 	
 	
-	public ProductEntity(String product_name, String product_description, double productPrice,
-			int productStockQuantity, int category_id, int unit_id, String product_image_url) {
+	public ProductEntity(String productName, String productDescription, double productPrice,
+			int productStockQuantity, int categoryId, int unitId, String productImageUrl) {
 		super();
-		this.productName = product_name;
-		this.product_description = product_description;
+		this.productName = productName;
+		this.productDescription = productDescription;
 		this.productPrice = productPrice;
 		this.productStockQuantity = productStockQuantity;
-		this.categoryId = category_id;
-		this.unitId = unit_id;
-		this.product_image_url = product_image_url;
+		this.categoryId = categoryId;
+		this.unitId = unitId;
+		this.productImageUrl = productImageUrl;
 		
 		
 	}

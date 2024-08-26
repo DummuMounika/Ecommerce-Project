@@ -19,120 +19,117 @@ public class CustomerEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int customer_id;
+	private int customerId;
 	
 	@Column(name="customer_first_name")
 	private String customerFirstName;
 	
 	@Column
-	private String customer_last_name;
+	private String customerLastName;
 	
 	@Column(name = "customer_email")
 	private String customerEmail;
 	
 	@Column
-	private String customer_password;
+	private String customerPassword;
 	
 	@Column
-	private String customer_address;
+	private String customerAddress;
 	
 	@Column
-	private String customer_phone_number;
+	private String customerPhoneNumber;
 	
 	@Column
-	private boolean customer_email_verification;
-	
-	@Column
-	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp customer_created_time;
+	private boolean customerEmailVerification;
 	
 	@Column
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp customer_updated_time;
+    private Timestamp customerCreatedTime;
+	
+	@Column
+	@JsonSerialize(using = JsonTimestampSerializer.class)
+    private Timestamp customerUpdatedTime;
     
-	public int getCustomer_id() {
-		return customer_id;
+	public int getCustomerId() {
+		return customerId;
 	}
-	public void setCustomer_id(int customer_id) {
-		this.customer_id = customer_id;
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
 	}
-	public String getCustomer_first_name() {
+	public String getCustomerFirstName() {
 		return customerFirstName;
 	}
-	public void setCustomer_first_name(String CustomerFirstName) {
-		this.customerFirstName = CustomerFirstName;
+	public void setCustomerFirstName(String customerFirstName) {
+		this.customerFirstName = customerFirstName;
 	}
-	public String getCustomer_last_name() {
-		return customer_last_name;
+	public String getCustomerLastName() {
+		return customerLastName;
 	}
-	public void setCustomer_last_name(String customer_last_name) {
-		this.customer_last_name = customer_last_name;
+	public void setCustomerLastName(String customerLastName) {
+		this.customerLastName = customerLastName;
 	}
-	public String getCustomer_email() {
+	public String getCustomerEmail() {
 		return customerEmail;
 	}
-	public void setCustomer_email(String customerEmail) {
+	public void setCustomerEmail(String customerEmail) {
 		this.customerEmail = customerEmail;
 	}
-	public String getCustomer_password() {
-		return customer_password;
+	public String getCustomerPassword() {
+		return customerPassword;
 	}
-	public void setCustomer_password(String customer_password) {
-		this.customer_password = customer_password;
+	public void setCustomerPassword(String customerPassword) {
+		this.customerPassword = customerPassword;
 	}
-	public String getCustomer_address() {
-		return customer_address;
+	public String getCustomerAddress() {
+		return customerAddress;
 	}
-	public void setCustomer_address(String customer_address) {
-		this.customer_address = customer_address;
+	public void setCustomerAddress(String customerAddress) {
+		this.customerAddress = customerAddress;
 	}
-	public String getCustomer_phone_number() {
-		return customer_phone_number;
+	public String getCustomerPhoneNumber() {
+		return customerPhoneNumber;
 	}
-	public void setCustomer_phone_number(String customer_phone_number) {
-		this.customer_phone_number = customer_phone_number;
+	public void setCustomerPhoneNumber(String customerPhoneNumber) {
+		this.customerPhoneNumber = customerPhoneNumber;
 	}
-	public boolean isCustomer_email_verification() {
-		return customer_email_verification;
+	public boolean isCustomerEmailVerification() {
+		return customerEmailVerification;
 	}
-	public void setCustomer_email_verification(boolean customer_email_verification) {
-		this.customer_email_verification = customer_email_verification;
+	public void setCustomerEmailVerification(boolean customerEmailVerification) {
+		this.customerEmailVerification = customerEmailVerification;
 	}
-	public Timestamp getCustomer_created_time() {
-		return customer_created_time;
+	public Timestamp getCustomerCreatedTime() {
+		return customerCreatedTime;
 	}
-	public void setCustomer_created_time(Timestamp customer_created_time) {
-		this.customer_created_time = customer_created_time;
+	public void setCustomerCreatedTime(Timestamp customerCreatedTime) {
+		this.customerCreatedTime = customerCreatedTime;
 	}
-	public Timestamp getCustomer_updated_time() {
-		return customer_updated_time;
+	public Timestamp getCustomerUpdatedTime() {
+		return customerUpdatedTime;
 	}
-	public void setCustomer_updated_time(Timestamp customer_updated_time) {
-		this.customer_updated_time = customer_updated_time;
+	public void setCustomerUpdatedTime(Timestamp customerUpdatedTime) {
+		this.customerUpdatedTime = customerUpdatedTime;
 	}
 	
 	@Override
 	public String toString() {
-		return "Customer [customer_id=" + customer_id + ", CustomerFirstName=" + customerFirstName
-				+ ", customer_last_name=" + customer_last_name + ", customerEmail=" + customerEmail
-				+ ", customer_password=" + customer_password + ", customer_address=" + customer_address
-				+ ", customer_phone_number=" + customer_phone_number + ", customer_email_verification="
-				+ customer_email_verification + ", customer_created_time=" + customer_created_time
-				+ ", customer_updated_time=" + customer_updated_time + "]";
+		return "Customer [customer_id=" + customerId + ", CustomerFirstName=" + customerFirstName
+				+ ", customer_last_name=" + customerLastName + ", customerEmail=" + customerEmail
+				+ ", customer_password=" + customerPassword + ", customer_address=" + customerAddress
+				+ ", customer_phone_number=" + customerPhoneNumber + ", customer_email_verification="
+				+ customerEmailVerification + ", customer_created_time=" + customerCreatedTime
+				+ ", customer_updated_time=" + customerUpdatedTime + "]";
 	}
 	
-	public CustomerEntity(String customerFirstName, String customer_last_name, String customerEmail,
-			//String customer_password, 
-			String customer_address, String customer_phone_number,
-			boolean customer_email_verification) {
+	public CustomerEntity(String customerFirstName, String customerLastName, String customerEmail,
+			String customerAddress, String customerPhoneNumber,boolean customerEmailVerification) {
 		super();
 		this.customerFirstName = customerFirstName;
-		this.customer_last_name = customer_last_name;
+		this.customerLastName = customerLastName;
 		this.customerEmail = customerEmail;
-		//this.customer_password = customer_password;
-		this.customer_address = customer_address;
-		this.customer_phone_number = customer_phone_number;
-		this.customer_email_verification = customer_email_verification;
+		this.customerAddress = customerAddress;
+		this.customerPhoneNumber = customerPhoneNumber;
+		this.customerEmailVerification = customerEmailVerification;
 	}
 	
 	public CustomerEntity() {

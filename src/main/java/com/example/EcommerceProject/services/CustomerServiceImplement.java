@@ -3,13 +3,13 @@ package com.example.EcommerceProject.services;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.example.EcommerceProject.exceptions.CustomerNotFoundException;
 import com.example.EcommerceProject.exceptions.NotFoundException;
 import com.example.EcommerceProject.model.Customer;
 import com.example.EcommerceProject.modelEntity.CustomerEntity;
@@ -18,21 +18,27 @@ import com.example.EcommerceProject.repository.CustomerRepository;
 @Service
 public class CustomerServiceImplement implements CustomerService {
 
-	@Autowired
+	
 	private CustomerRepository customerRepository;
+	Logger logger = Logger.getLogger(getClass().getName());
 
+	@Autowired
+	public CustomerServiceImplement(CustomerRepository customerRepository) {
+		super();
+		this.customerRepository = customerRepository;
+	}
 
 	//convertMethods
 	private Customer convertCustomerEntityToCustomer(CustomerEntity customerEntity) {
-		return new Customer(customerEntity.getCustomer_id(),customerEntity.getCustomer_first_name(),
-				customerEntity.getCustomer_last_name(),customerEntity.getCustomer_email(),
+		return new Customer(customerEntity.getCustomerId(),customerEntity.getCustomerFirstName(),
+				customerEntity.getCustomerLastName(),customerEntity.getCustomerEmail(),
 				//customerEntity.getCustomer_password()
-				customerEntity.getCustomer_address(),customerEntity.getCustomer_phone_number(),customerEntity.isCustomer_email_verification(),
-				customerEntity.getCustomer_created_time(),customerEntity.getCustomer_updated_time());
+				customerEntity.getCustomerAddress(),customerEntity.getCustomerPhoneNumber(),customerEntity.isCustomerEmailVerification(),
+				customerEntity.getCustomerCreatedTime(),customerEntity.getCustomerUpdatedTime());
 	}
 
 	private List<Customer> convertCustomerEntityListToCustomerList(List<CustomerEntity> customerEntityList){
-		List<Customer> customerList = new ArrayList<Customer>();
+		List<Customer> customerList = new ArrayList<>();
 		for(CustomerEntity customerEntity: customerEntityList) {
 			Customer customer = convertCustomerEntityToCustomer(customerEntity);
 			customerList.add(customer);
@@ -41,9 +47,9 @@ public class CustomerServiceImplement implements CustomerService {
 	}
 
 	private CustomerEntity convertCustomerToCustomerEntity(Customer customer) {
-		return new CustomerEntity(customer.getCustomer_first_name(),customer.getCustomer_last_name(),customer.getCustomer_email(),
+		return new CustomerEntity(customer.getCustomerFirstName(),customer.getCustomerLastName(),customer.getCustomerEmail(),
 				//customer.getCustomer_password(),
-				customer.getCustomer_address(),customer.getCustomer_phone_number(),customer.isCustomer_email_verification());
+				customer.getCustomerAddress(),customer.getCustomerPhoneNumber(),customer.isCustomerEmailVerification());
 	}
 
 
@@ -51,74 +57,86 @@ public class CustomerServiceImplement implements CustomerService {
 	@Override
 	public List<Customer> getAllCustomerDetails() {
 		List<CustomerEntity> customerEntityList = customerRepository.findAll();
-		List<Customer> customerList = convertCustomerEntityListToCustomerList(customerEntityList);
-		return customerList;
+		return convertCustomerEntityListToCustomerList(customerEntityList);
 	}
 
 	@Override
 	public boolean addCustomerInfo(Customer customer) {
-		CustomerEntity customerEntity = convertCustomerToCustomerEntity(customer);
-		//Hash the password
-		customerEntity.setCustomer_password(BCrypt.hashpw(customerEntity.getCustomer_password(), BCrypt.gensalt()));
-		//method to set created and update time
-		Timestamp currentTimestamp = customerRepository.findCurrentTimeStamp();
-		customerEntity.setCustomer_created_time(currentTimestamp);
-		customerEntity.setCustomer_updated_time(currentTimestamp);
-		CustomerEntity entity = customerRepository.save(customerEntity);	
-		if (entity != null) {
-			return true;
-		}else {
-			return false;
-		}
+	 try {
+	        // Convert Customer to CustomerEntity
+	        CustomerEntity customerEntity = convertCustomerToCustomerEntity(customer);
+	        
+	        // Hash the password
+	        customerEntity.setCustomerPassword(BCrypt.hashpw(customerEntity.getCustomerPassword(), BCrypt.gensalt()));
+	        
+	        // Set created and updated timestamps
+	        Timestamp currentTimestamp = customerRepository.findCurrentTimeStamp();
+	        customerEntity.setCustomerCreatedTime(currentTimestamp);
+	        customerEntity.setCustomerUpdatedTime(currentTimestamp);
+	        
+	        // Save the entity
+	        customerRepository.save(customerEntity);
+	        return true;
+	    } catch (Exception e) {
+	        // Log the exception
+	        logger.severe("Failed to add customer info: " + e.getMessage());
+	        return false;
+	    }
 	}
 
 	@Override
 	public String deleteCustomerInfo(int customerId) {
 		CustomerEntity removeCustomerEntity = customerRepository.findById(customerId)
-				.orElseThrow(() -> new NotFoundException("customer Id not found"));
+				.orElseThrow(() -> new CustomerNotFoundException("customer Id not found"));
 		customerRepository.delete(removeCustomerEntity);
 		return "The " + customerId + " deleted successfully" ;
 	}
 
 	@Override
 	public Customer updateCustomerInfo(Customer customer, int customerId) {
-		CustomerEntity existingCustomerEntity = customerRepository.findById(customerId)
-				.orElseThrow(() -> new NotFoundException("customer Id not found"));
-		existingCustomerEntity.setCustomer_first_name(customer.getCustomer_first_name());
-		existingCustomerEntity.setCustomer_last_name(customer.getCustomer_last_name());
-		existingCustomerEntity.setCustomer_email(customer.getCustomer_email());
+	    CustomerEntity existingCustomerEntity = customerRepository.findById(customerId)
+	            .orElseThrow(() -> new CustomerNotFoundException("Customer not found with the given ID."));
+	    
+	    // Update customer details
+	    existingCustomerEntity.setCustomerFirstName(customer.getCustomerFirstName());
+	    existingCustomerEntity.setCustomerLastName(customer.getCustomerLastName());
+	    existingCustomerEntity.setCustomerEmail(customer.getCustomerEmail());
 
-		//Hash the password before updating
-		if(customer.getCustomer_password() != null) {
-			existingCustomerEntity.setCustomer_password(BCrypt.hashpw(customer.getCustomer_password(), BCrypt.gensalt()));
-		}
-		existingCustomerEntity.setCustomer_updated_time(customerRepository.findCurrentTimeStamp());
-		CustomerEntity saveCustomerEntity = customerRepository.save(existingCustomerEntity);
-		return convertCustomerEntityToCustomer(saveCustomerEntity);
+	    // Hash the password before updating if provided
+	    if (customer.getCustomerPassword() != null) {
+	        existingCustomerEntity.setCustomerPassword(BCrypt.hashpw(customer.getCustomerPassword(), BCrypt.gensalt()));
+	    }
+
+	    // Update the timestamp
+	    existingCustomerEntity.setCustomerUpdatedTime(customerRepository.findCurrentTimeStamp());
+
+	    // Save the updated entity
+	    CustomerEntity savedCustomerEntity = customerRepository.save(existingCustomerEntity);
+
+	    // Convert and return the updated customer
+	    return convertCustomerEntityToCustomer(savedCustomerEntity);
 	}
+		
 
 	@Override
 	public Customer getSingleCustomerInfo(int customerId) {
 		CustomerEntity getSingleCustomer = customerRepository.findById(customerId)
-				.orElseThrow(() -> new NotFoundException("customer Id not found"));
+				.orElseThrow(() -> new CustomerNotFoundException("customer not found with the given ID."));
 		return convertCustomerEntityToCustomer(getSingleCustomer);
 	}
 
 	@Override
 	public Boolean isUserAuthorized(Customer customer) {
-		CustomerEntity existingCustomerEntity = customerRepository.findBycustomerEmail(customer.getCustomer_email());
+		CustomerEntity existingCustomerEntity = customerRepository.findBycustomerEmail(customer.getCustomerEmail());
 
 		if (existingCustomerEntity == null) {
 			throw new NotFoundException("Entered email not found");
 		}
 
-		String storedPassword = existingCustomerEntity.getCustomer_password();
+		String storedPassword = existingCustomerEntity.getCustomerPassword();
 
-		if (BCrypt.checkpw(customer.getCustomer_password(), storedPassword)) {
-			return true;
-		} else {
-			return false;
-		}
+		return BCrypt.checkpw(customer.getCustomerPassword(), storedPassword);
+	
 	}
 
 

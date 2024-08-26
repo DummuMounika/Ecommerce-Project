@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.EcommerceProject.modelEntity.AddToCartEntity;
-import com.example.EcommerceProject.modelEntity.CategoryEntity;
 
 public interface CartRepository extends JpaRepository<AddToCartEntity, Integer> {
 

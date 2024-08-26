@@ -7,33 +7,33 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class AddToCart {
 	
-	 private int cart_id;
-	 private int customer_id;
-	 private int product_id;
+	 private int cartId;
+	 private int customerId;
+	 private int productId;
 	 private int quantity;
-	 private double unit_price;
+	 private double unitPrice;
 	 @JsonSerialize(using = JsonTimestampSerializer.class)
-	 private Timestamp cart_created_time;
+	 private Timestamp cartCreatedTime;
 	 @JsonSerialize(using = JsonTimestampSerializer.class)
-	 private Timestamp cart_updated_time;
+	 private Timestamp cartUpdatedTime;
 	 
-	public int getCart_id() {
-		return cart_id;
+	public int getCartId() {
+		return cartId;
 	}
-	public void setCart_id(int cart_id) {
-		this.cart_id = cart_id;
+	public void setCartId(int cartId) {
+		this.cartId = cartId;
 	}
-	public int getCustomer_id() {
-		return customer_id;
+	public int getCustomerId() {
+		return customerId;
 	}
-	public void setCustomer_id(int customer_id) {
-		this.customer_id = customer_id;
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
 	}
-	public int getProduct_id() {
-		return product_id;
+	public int getProductId() {
+		return productId;
 	}
-	public void setProduct_id(int product_id) {
-		this.product_id = product_id;
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
 	public int getQuantity() {
 		return quantity;
@@ -41,41 +41,41 @@ public class AddToCart {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public double getUnit_price() {
-		return unit_price;
+	public double getUnitPrice() {
+		return unitPrice;
 	}
-	public void setUnit_price(double unit_price) {
-		this.unit_price = unit_price;
+	public void setUnitPrice(double unitPrice) {
+		this.unitPrice = unitPrice;
 	}
-	public Timestamp getCart_created_time() {
-		return cart_created_time;
+	public Timestamp getCartCreatedTime() {
+		return cartCreatedTime;
 	}
-	public void setCart_created_time(Timestamp cart_created_time) {
-		this.cart_created_time = cart_created_time;
+	public void setCartCreatedTime(Timestamp cartCreatedTime) {
+		this.cartCreatedTime = cartCreatedTime;
 	}
-	public Timestamp getCart_updated_time() {
-		return cart_updated_time;
+	public Timestamp getCartUpdatedTime() {
+		return cartUpdatedTime;
 	}
-	public void setCart_updated_time(Timestamp cart_updated_time) {
-		this.cart_updated_time = cart_updated_time;
+	public void setCartUpdatedTime(Timestamp cartUpdatedTime) {
+		this.cartUpdatedTime = cartUpdatedTime;
 	}
 	
 	@Override
 	public String toString() {
-		return "AddToCart [cart_id=" + cart_id + ", customer_id=" + customer_id + ", product_id=" + product_id
-				+ ", quantity=" + quantity + ", unit_price=" + unit_price + ", cart_created_time=" + cart_created_time
-				+ ", cart_updated_time=" + cart_updated_time + "]";
+		return "AddToCart [cart_id=" + cartId + ", customer_id=" + customerId + ", product_id=" + productId
+				+ ", quantity=" + quantity + ", unit_price=" + unitPrice + ", cart_created_time=" + cartCreatedTime
+				+ ", cart_updated_time=" + cartUpdatedTime + "]";
 	}
-	public AddToCart(int cart_id, int customer_id, int product_id, int quantity, double unit_price,
-			Timestamp cart_created_time, Timestamp cart_updated_time) {
+	public AddToCart(int cartId, int customerId, int productId, int quantity, double unitPrice,
+			Timestamp cartCreatedTime, Timestamp cartUpdatedTime) {
 		super();
-		this.cart_id = cart_id;
-		this.customer_id = customer_id;
-		this.product_id = product_id;
+		this.cartId = cartId;
+		this.customerId = customerId;
+		this.productId = productId;
 		this.quantity = quantity;
-		this.unit_price = unit_price;
-		this.cart_created_time = cart_created_time;
-		this.cart_updated_time = cart_updated_time;
+		this.unitPrice = unitPrice;
+		this.cartCreatedTime = cartCreatedTime;
+		this.cartUpdatedTime = cartUpdatedTime;
 	}
 	
 	public AddToCart() {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,19 +19,32 @@ import com.example.EcommerceProject.model.Product;
 import com.example.EcommerceProject.modelEntity.ProductEntity;
 import com.example.EcommerceProject.repository.ProductRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+
 @Service
 public class ProductServiceImplement  implements ProductService{
 
-	@Autowired
+
 	private ProductRepository productRepository;
-
 	@Lazy
-	@Autowired
-	private CategoryService  categoryService;
-
-	@Autowired
+	private CategoryService  categoryService;	
 	private UnitService unitService;
-
+	
+	Logger logger = Logger.getLogger(getClass().getName());
+	
+    @PersistenceContext
+    private EntityManager entityManager;
+    
+    @Autowired
+    public ProductServiceImplement(ProductRepository productRepository, CategoryService categoryService,
+			UnitService unitService) {
+		super();
+		this.productRepository = productRepository;
+		this.categoryService = categoryService;
+		this.unitService = unitService;
+    }
 
 
 	//convertMethods
@@ -42,13 +56,13 @@ public class ProductServiceImplement  implements ProductService{
 	 * @return product {@link Product}
 	 */
 	private Product convertProductEntityToProduct(ProductEntity productEntity) {
-		return new Product(productEntity.getProductId(),productEntity.getProduct_name(),productEntity.getProduct_description(),
-				productEntity.getProduct_price(),productEntity.getProduct_stock_quantity(),productEntity.getCategory_id(),
-				productEntity.getCategoryEntity().getCategory_name(),
-				productEntity.getUnit_id(),
-				productEntity.getUnitEntity().getUnit_name(),
-				productEntity.getProduct_image_url(),productEntity.getProduct_created_time(),
-				productEntity.getProduct_updated_time());
+		return new Product(productEntity.getProductId(),productEntity.getProductName(),productEntity.getProductDescription(),
+				productEntity.getProductPrice(),productEntity.getProductStockQuantity(),productEntity.getCategoryId(),
+				productEntity.getCategoryEntity().getCategoryName(),
+				productEntity.getUnitId(),
+				productEntity.getUnitEntity().getUnitName(),
+				productEntity.getProductImageUrl(),productEntity.getProductCreatedTime(),
+				productEntity.getProductUpdatedTime());
 	}
 
 	/**
@@ -59,7 +73,7 @@ public class ProductServiceImplement  implements ProductService{
 	 */
 	@Override
 	public List<Product> convertProductEntityListToProductList(List<ProductEntity> productEntityList){
-		List<Product> productList = new ArrayList<Product>();
+		List<Product> productList = new ArrayList<>();
 		for(ProductEntity productEntity: productEntityList) {
 			Product product = convertProductEntityToProduct(productEntity);
 			productList.add(product);
@@ -74,11 +88,21 @@ public class ProductServiceImplement  implements ProductService{
 	 * @return productEntity {@link ProductEntity}
 	 */
 	private ProductEntity convertProductToProductEntity(Product product) {
-		return new ProductEntity(product.getProduct_name(),product.getProduct_description(),
-				product.getProduct_price(), product.getProduct_stock_quantity(),
-				product.getCategory_id(),
-				product.getUnit_id(),product.getProduct_image_url());
+		return new ProductEntity(product.getProductName(),product.getProductDescription(),
+				product.getProductPrice(), product.getProductStockQuantity(),
+				product.getCategoryId(),
+				product.getUnitId(),product.getProductImageUrl());
 	}
+	
+	
+	   
+	    private List<ProductEntity> findWithLimitAndOffset(int limit, int offset, String sortBy, String sortDir) {
+	        String sql = "SELECT * FROM products ORDER BY " + sortBy + " " + sortDir + " LIMIT :limit OFFSET :offset";
+	        Query query = entityManager.createNativeQuery(sql, ProductEntity.class);
+	        query.setParameter("limit", limit);
+	        query.setParameter("offset", offset);
+	        return query.getResultList();
+	    }
 
 
 
@@ -90,11 +114,29 @@ public class ProductServiceImplement  implements ProductService{
 	 * @return A {@link List} of {@link Product}
 	 */
 	@Override
-	public List<Product> getAllProducts() {
-		List<ProductEntity> productEntityList = productRepository.findAll();
-		List<Product> productList = convertProductEntityListToProductList(productEntityList);
-		return productList;	
-	}
+	public List<Product> getAllProducts(int limit, int offset, String sortBy, String sortDirection) {
+		List<ProductEntity> productEntityList;
+		
+		List<String> sortDirections = new ArrayList<>();
+		sortDirections.add("ASC");
+		sortDirections.add("DESC");
+		if(!sortDirections.contains(sortDirection)) {
+			throw new IllegalArgumentException("Invalid sort Directions.");
+		}
+		
+	    if (limit > 0 && offset >= 0 && !sortBy.isEmpty() && !sortDirection.isEmpty()) {
+	       productEntityList = findWithLimitAndOffset(limit, offset, sortBy, sortDirection);
+	    	//findWithLimitAndOffset
+	    } else {
+	        productEntityList = productRepository.findAll();
+	    }
+
+	    if (productEntityList.isEmpty()) {
+	        throw new NotFoundException("products not found");
+	    }
+
+	    return convertProductEntityListToProductList(productEntityList);
+		}
 
 
 	/**
@@ -106,19 +148,26 @@ public class ProductServiceImplement  implements ProductService{
 	 */
 	@Override
 	public boolean createProduct(Product product) {
+		try {
+	        // Retrieve current timestamp
+	        Timestamp currentTimestamp = productRepository.findCurrentTimeStamp();
 
-		Timestamp currentTimestamp = productRepository.findCurrentTimeStamp();
-		ProductEntity newProductEntity = addProduct(product);	
-		newProductEntity.setProduct_created_time(currentTimestamp);
-		newProductEntity.setProduct_updated_time(currentTimestamp);
-		System.out.println(newProductEntity.toString());
-		newProductEntity = productRepository.save(newProductEntity);
+	        // Convert Product to ProductEntity and set timestamps
+	        ProductEntity newProductEntity = addProduct(product);
+	        newProductEntity.setProductCreatedTime(currentTimestamp);
+	        newProductEntity.setProductUpdatedTime(currentTimestamp);
 
-		if (newProductEntity != null) {
-			return true;
-		}else {
-			return false;
-		}	
+	        // Log the new product entity
+	        logger.info("Creating product: " + newProductEntity.toString());
+
+	        // Save the entity
+	        productRepository.save(newProductEntity);
+	        return true;
+	    } catch (Exception e) {
+	        // Log the exception
+	        logger.severe("Failed to create product: " + e.getMessage());
+	        return false;
+	    }
 	}
 
 	/**
@@ -130,12 +179,12 @@ public class ProductServiceImplement  implements ProductService{
 	 */
 	private ProductEntity addProduct(Product product) {
 		//Get categoryname from product
-		int categoryId = categoryService.createCategory(new Category(product.getCategory_name()));
-		int unitId = unitService.findUnitId(product.getUnit_name());
+		int categoryId = categoryService.createCategory(new Category(product.getCategoryName()));
+		int unitId = unitService.findUnitId(product.getUnitName());
 
 		ProductEntity productEntity = convertProductToProductEntity(product);
-		productEntity.setUnit_id(unitId);
-		productEntity.setCategory_id(categoryId);
+		productEntity.setUnitId(unitId);
+		productEntity.setCategoryId(categoryId);
 		return productEntity;
 
 	}
@@ -152,8 +201,8 @@ public class ProductServiceImplement  implements ProductService{
 		if(existingProductEntity.isPresent()) {
 			ProductEntity productEntity = addProduct(product);
 			productEntity.setProductId(existingProductEntity.get().getProductId());
-			productEntity.setProduct_created_time(existingProductEntity.get().getProduct_created_time());
-			productEntity.setProduct_updated_time(productRepository.findCurrentTimeStamp());
+			productEntity.setProductCreatedTime(existingProductEntity.get().getProductCreatedTime());
+			productEntity.setProductUpdatedTime(productRepository.findCurrentTimeStamp());
 			ProductEntity saveProductEntity = productRepository.save(productEntity);
 			return convertProductEntityToProduct(saveProductEntity) ;
 
@@ -170,22 +219,22 @@ public class ProductServiceImplement  implements ProductService{
 	 * @return String (confirmation message)
 	 */
 	@Override
-	public String deleteProduct(int product_Id) {
-		Optional<ProductEntity> removeProductEntity = productRepository.findById(product_Id);
+	public String deleteProduct(int productId) {
+		Optional<ProductEntity> removeProductEntity = productRepository.findById(productId);
 		if(removeProductEntity.isPresent()) {
 			// Logging to confirm deletion process is reached
-			System.out.println(">>>start>Deleting Product name: " + removeProductEntity.get().getProduct_name());
+			logger.info(">>>start>Deleting Product name: " + removeProductEntity.get().getProductName());
 			try {
-				productRepository.deleteById(product_Id);
+				productRepository.deleteById(productId);
 			} catch (DataIntegrityViolationException  e) {
 				throw new ConflictException(e.getMessage()); // Re-throwing the exception to preserve the original behavior
 			}catch (Exception e) {
 				throw new RuntimeException(e.getMessage());
 			}
-			System.out.println(">end>>>Deleted Product ID: " + product_Id);
-			return "The product with ID " + product_Id + " deleted successfully";		
+			logger.info(">end>>>Deleted Product ID: " + productId);
+			return "The product with ID " + productId + " deleted successfully";		
 		}else {
-			throw new NotFoundException("The product " +product_Id + " not found.");
+			throw new NotFoundException("The product " +productId + " not found.");
 		}
 	}
 
@@ -199,8 +248,7 @@ public class ProductServiceImplement  implements ProductService{
 	public Product getSingleProduct(int productId) {
 		ProductEntity singleProductEntity = productRepository.findById(productId)
 				.orElseThrow(() -> new NotFoundException("product Id not found"));
-		Product singleProduct = convertProductEntityToProduct(singleProductEntity);
-		return singleProduct;
+		return convertProductEntityToProduct(singleProductEntity);
 	}
 
 	/**
@@ -212,17 +260,14 @@ public class ProductServiceImplement  implements ProductService{
 	@Override
 	public HashMap<Integer, Product> getMultipleProducts(List<Integer> productIds) {
 		List<ProductEntity> productEntities = productRepository.findAllById(productIds);
-
-
 		HashMap<Integer, Product> productMap = new HashMap<>();
-
 		for(ProductEntity productEntity: productEntities) {		    
 			Product product = convertProductEntityToProduct(productEntity);   
 			productMap.put(productEntity.getProductId(), product);
 		}
 
 		return productMap;
-	};
+	}
 
 
 

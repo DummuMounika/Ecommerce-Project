@@ -8,123 +8,123 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class Product {
 
-	private int product_id;
-	private String product_name;
-	private String product_description;
-	private double product_price;
-	private int product_stock_quantity;
+	private int productId;
+	private String productName;
+	private String productDescription;
+	private double productPrice;
+	private int productStockQuantity;
 	@JsonIgnore
-	private int category_id;
-	private String category_name;
+	private int categoryId;
+	private String categoryName;
 	@JsonIgnore
-	private int unit_id;
-	private String unit_name;
-	private String product_image_url;
+	private int unitId;
+	private String unitName;
+	private String productImageUrl;
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp product_created_time;
+    private Timestamp productCreatedTime;
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp product_updated_time;
+    private Timestamp productUpdatedTime;
     
-	public int getProduct_id() {
-		return product_id;
+	public int getProductId() {
+		return productId;
 	}
-	public void setProduct_id(int product_id) {
-		this.product_id = product_id;
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
-	public String getProduct_name() {
-		return product_name;
+	public String getProductName() {
+		return productName;
 	}
-	public void setProduct_name(String product_name) {
-		this.product_name = product_name;
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
-	public String getProduct_description() {
-		return product_description;
+	public String getProductDescription() {
+		return productDescription;
 	}
-	public void setProduct_description(String product_description) {
-		this.product_description = product_description;
+	public void setProductDescription(String productDescription) {
+		this.productDescription = productDescription;
 	}
-	public double getProduct_price() {
-		return product_price;
+	public double getProductPrice() {
+		return productPrice;
 	}
-	public void setProduct_price(double product_price) {
-		this.product_price = product_price;
+	public void setProductPrice(double productPrice) {
+		this.productPrice = productPrice;
 	}
-	public int getProduct_stock_quantity() {
-		return product_stock_quantity;
+	public int getProductStockQuantity() {
+		return productStockQuantity;
 	}
-	public void setProduct_stock_quantity(int product_stock_quantity) {
-		this.product_stock_quantity = product_stock_quantity;
+	public void setProductStockQuantity(int productStockQuantity) {
+		this.productStockQuantity = productStockQuantity;
 	}
-	public int getCategory_id() {
-		return category_id;
+	public int getCategoryId() {
+		return categoryId;
 	}
-	public void setCategory_id(int category_id) {
-		this.category_id = category_id;
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
-	public int getUnit_id() {
-		return unit_id;
+	public int getUnitId() {
+		return unitId;
 	}
-	public void setUnit_id(int unit_id) {
-		this.unit_id = unit_id;
+	public void setUnitId(int unitId) {
+		this.unitId = unitId;
 	}
-	public String getUnit_name() {
-		return unit_name;
+	public String getUnitName() {
+		return unitName;
 	}
-	public void setUnit_name(String unit_name) {
-		this.unit_name = unit_name;
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
 	}
-	public String getCategory_name() {
-		return category_name;
+	public String getCategoryName() {
+		return categoryName;
 	}
-	public void setCategory_name(String category_name) {
-		this.category_name = category_name;
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
-	public String getProduct_image_url() {
-		return product_image_url;
+	public String getProductImageUrl() {
+		return productImageUrl;
 	}
-	public void setProduct_image_url(String product_image_url) {
-		this.product_image_url = product_image_url;
+	public void setProductImageUrl(String productImageUrl) {
+		this.productImageUrl = productImageUrl;
 	}
-	public Timestamp getProduct_created_time() {
-		return product_created_time;
+	public Timestamp getProductCreatedTime() {
+		return productCreatedTime;
 	}
-	public void setProduct_created_time(Timestamp product_created_time) {
-		this.product_created_time = product_created_time;
+	public void setProductCreatedTime(Timestamp productCreatedTime) {
+		this.productCreatedTime = productCreatedTime;
 	}
-	public Timestamp getProduct_updated_time() {
-		return product_updated_time;
+	public Timestamp getProductUpdatedTime() {
+		return productUpdatedTime;
 	}
-	public void setProduct_updated_time(Timestamp product_updated_time) {
-		this.product_updated_time = product_updated_time;
+	public void setProductUpdatedTime(Timestamp productUpdatedTime) {
+		this.productUpdatedTime = productUpdatedTime;
 	}
 	
 	
 	@Override
 	public String toString() {
-		return "Product [product_id=" + product_id + ", product_name=" + product_name + ", product_description="
-				+ product_description + ", product_price=" + product_price + ", product_stock_quantity="
-				+ product_stock_quantity + ", category_id=" + category_id + ", category_name=" + category_name
-				+ ", unit_id=" + unit_id + ", product_image_url=" + product_image_url + ", product_created_time="
-				+ product_created_time + ", product_updated_time=" + product_updated_time + "]";
+		return "Product [product_id=" + productId + ", product_name=" + productName + ", product_description="
+				+ productDescription + ", product_price=" + productPrice + ", product_stock_quantity="
+				+ productStockQuantity + ", category_id=" + categoryId + ", category_name=" + categoryName
+				+ ", unit_id=" + unitId + ", product_image_url=" + productImageUrl + ", product_created_time="
+				+ productCreatedTime + ", product_updated_time=" + productUpdatedTime + "]";
 	}
 	
 	
-	public Product(int product_id, String product_name, String product_description, double product_price,
-			int product_stock_quantity, int category_id, String category_name,int unit_id,String unit_name, String product_image_url,
-			Timestamp product_created_time, Timestamp product_updated_time) {
+	public Product(int productId, String productName, String productDescription, double productPrice,
+			int productStockQuantity, int categoryId, String categoryName,int unitId,String unitName, String productImageUrl,
+			Timestamp productCreatedTime, Timestamp productUpdatedTime) {
 		super();
-		this.product_id = product_id;
-		this.product_name = product_name;
-		this.product_description = product_description;
-		this.product_price = product_price;
-		this.product_stock_quantity = product_stock_quantity;
-		this.category_id = category_id;
-		this.category_name = category_name;
-		this.unit_id = unit_id;
-		this.unit_name = unit_name;
-		this.product_image_url = product_image_url;
-		this.product_created_time = product_created_time;
-		this.product_updated_time = product_updated_time;
+		this.productId = productId;
+		this.productName = productName;
+		this.productDescription = productDescription;
+		this.productPrice = productPrice;
+		this.productStockQuantity = productStockQuantity;
+		this.categoryId = categoryId;
+		this.categoryName = categoryName;
+		this.unitId = unitId;
+		this.unitName = unitName;
+		this.productImageUrl = productImageUrl;
+		this.productCreatedTime = productCreatedTime;
+		this.productUpdatedTime = productUpdatedTime;
 	}
 	public Product() {
 		

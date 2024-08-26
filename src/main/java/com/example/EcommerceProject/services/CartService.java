@@ -10,6 +10,6 @@ public interface CartService {
 	
 	public List<AddToCart> getAllCartDetails();
 	public boolean addCart(AddToCart addCart);
-	public String deleteCartDetails(int cart_Id);
+	public String deleteCartDetails(int cartId);
 	public CartResponse getCartDetails(int customerId);
 }

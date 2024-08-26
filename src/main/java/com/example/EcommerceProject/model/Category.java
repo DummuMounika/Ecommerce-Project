@@ -8,38 +8,38 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class Category {
 	
-	private int category_id;
-	private String category_name;
+	private int categoryId;
+	private String categoryName;
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp category_created_time;
+    private Timestamp categoryCreatedTime;
 	@JsonSerialize(using = JsonTimestampSerializer.class)
-    private Timestamp category_updated_time;
+    private Timestamp categoryUpdatedTime;
 	
 	private List<Product> products;
     
-	public int getCategory_id() {
-		return category_id;
+	public int getCategoryId() {
+		return categoryId;
 	}
-	public void setCategory_id(int category_id) {
-		this.category_id = category_id;
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
-	public String getCategory_name() {
-		return category_name;
+	public String getCategoryName() {
+		return categoryName;
 	}
-	public void setCategory_name(String category_name) {
-		this.category_name = category_name;
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
-	public Timestamp getCategory_created_time() {
-		return category_created_time;
+	public Timestamp getCategoryCreatedTime() {
+		return categoryCreatedTime;
 	}
-	public void setCategory_created_time(Timestamp category_created_time) {
-		this.category_created_time = category_created_time;
+	public void setCategoryCreatedTime(Timestamp categoryCreatedTime) {
+		this.categoryCreatedTime = categoryCreatedTime;
 	}
-	public Timestamp getCategory_updated_time() {
-		return category_updated_time;
+	public Timestamp getCategoryUpdatedTime() {
+		return categoryUpdatedTime;
 	}
-	public void setCategory_updated_time(Timestamp category_updated_time) {
-		this.category_updated_time = category_updated_time;
+	public void setCategoryUpdatedTime(Timestamp categoryUpdatedTime) {
+		this.categoryUpdatedTime = categoryUpdatedTime;
 	}
 	
 	public List<Product> getProducts() {
@@ -51,25 +51,25 @@ public class Category {
 	
 	@Override
 	public String toString() {
-		return "Category [category_id=" + category_id + ", category_name=" + category_name + ", category_created_time="
-				+ category_created_time + ", category_updated_time=" + category_updated_time + "]";
+		return "Category [category_id=" + categoryId + ", category_name=" + categoryName + ", category_created_time="
+				+ categoryCreatedTime + ", category_updated_time=" + categoryUpdatedTime + "]";
 	}
 	
-	public Category(int category_id, String category_name, List<Product> productList, Timestamp category_created_time,
-			Timestamp category_updated_time) {
+	public Category(int categoryId, String categoryName, List<Product> productList, Timestamp categoryCreatedTime,
+			Timestamp categoryUpdatedTime) {
 		super();
-		this.category_id = category_id;
-		this.category_name = category_name;
+		this.categoryId = categoryId;
+		this.categoryName = categoryName;
 		this.products = productList;
-		this.category_created_time = category_created_time;
-		this.category_updated_time = category_updated_time;
+		this.categoryCreatedTime = categoryCreatedTime;
+		this.categoryUpdatedTime = categoryUpdatedTime;
 	}
 	
 	public Category() {
 	}
 	
-	public Category(String category_name) {
-		this.category_name = category_name;
+	public Category(String categoryName) {
+		this.categoryName = categoryName;
 	}
 	
 	

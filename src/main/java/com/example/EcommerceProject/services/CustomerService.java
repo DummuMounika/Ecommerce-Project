@@ -9,8 +9,8 @@ public interface CustomerService {
 	
 	public List<Customer> getAllCustomerDetails();
 	public boolean addCustomerInfo(Customer customer);
-	public String deleteCustomerInfo(int customer_Id);
-	public Customer updateCustomerInfo(Customer customer, int customer_Id);
-	public Customer getSingleCustomerInfo(int customer_Id);
+	public String deleteCustomerInfo(int customerId);
+	public Customer updateCustomerInfo(Customer customer, int customerId);
+	public Customer getSingleCustomerInfo(int customerId);
 	public Boolean isUserAuthorized(Customer customer);
 	}

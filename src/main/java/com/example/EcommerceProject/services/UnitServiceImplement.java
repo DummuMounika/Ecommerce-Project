@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,8 +19,18 @@ import com.example.EcommerceProject.repository.UnitRepository;
 @Service
 public class UnitServiceImplement  implements UnitService{
 
-	@Autowired
 	private UnitRepository unitRepository;
+	
+	Logger logger = Logger.getLogger(getClass().getName());
+	private static final String MSG = " unit Id not Found";
+	
+	@Autowired
+	public UnitServiceImplement(UnitRepository unitRepository) {
+		super();
+		this.unitRepository = unitRepository;
+	}
+	
+	
 
 	//convertMethods
 
@@ -30,8 +41,8 @@ public class UnitServiceImplement  implements UnitService{
 	 * @return product {@link Unit}
 	 */
 	private Unit convertUnitEntityToUnit(UnitEntity unitEntity) {
-		return new Unit(unitEntity.getUnit_id(),unitEntity.getUnit_name(),unitEntity.getUnit_abbreviation(),
-				unitEntity.getUnit_created_time(),unitEntity.getUnit_updated_time());
+		return new Unit(unitEntity.getUnitId(),unitEntity.getUnitName(),unitEntity.getUnitAbbreviation(),
+				unitEntity.getUnitCreatedTime(),unitEntity.getUnitUpdatedTime());
 	}
 
 	/**
@@ -41,7 +52,7 @@ public class UnitServiceImplement  implements UnitService{
 	 * @return A {@link List} of {@link Unit}.
 	 */
 	private List<Unit> convertUnitEntityListToUnitList(List<UnitEntity> unitEntityList){
-		List<Unit> unitList = new ArrayList<Unit>();
+		List<Unit> unitList = new ArrayList<>();
 		for(UnitEntity unitEntity: unitEntityList) {
 			Unit unit = convertUnitEntityToUnit(unitEntity);
 			unitList.add(unit);
@@ -56,7 +67,7 @@ public class UnitServiceImplement  implements UnitService{
 	 * @return unitEntity {@link UnitEntity}
 	 */
 	private UnitEntity convertUnitToUnitEntity(Unit unit) {
-		return new UnitEntity(unit.getUnit_name(), unit.getUnit_abbreviation());
+		return new UnitEntity(unit.getUnitName(), unit.getUnitAbbreviation());
 	}
 
 	//Below are the CRUD operations
@@ -69,8 +80,7 @@ public class UnitServiceImplement  implements UnitService{
 	@Override
 	public List<Unit> getAllUnits() {
 		List<UnitEntity> unitEntityList = unitRepository.findAll();
-		List<Unit> unitList = convertUnitEntityListToUnitList(unitEntityList);
-		return unitList;
+		return convertUnitEntityListToUnitList(unitEntityList);
 	}
 
 	/**
@@ -82,16 +92,23 @@ public class UnitServiceImplement  implements UnitService{
 	 */
 	@Override
 	public boolean createUnit(Unit unit) {
-		UnitEntity unitEntity = convertUnitToUnitEntity(unit);
-		Timestamp curentTimestamp = unitRepository.findCurrentTimeStamp();
-		unitEntity.setUnit_created_time(curentTimestamp);
-		unitEntity.setUnit_updated_time(curentTimestamp);
-		UnitEntity entity = unitRepository.save(unitEntity);	
-		if (entity != null) {
-			return true;
-		}else {
-			return false;
-		}
+	    try {
+	        // Convert Unit to UnitEntity
+	        UnitEntity unitEntity = convertUnitToUnitEntity(unit);
+
+	        // Fetch current timestamp
+	        Timestamp currentTimestamp = unitRepository.findCurrentTimeStamp();
+	        unitEntity.setUnitCreatedTime(currentTimestamp);
+	        unitEntity.setUnitUpdatedTime(currentTimestamp);
+
+	        // Save the entity
+	        unitRepository.save(unitEntity);
+	        return true;
+	    } catch (Exception e) {
+	        // Log the exception
+	        logger.severe("Failed to create unit: " + e.getMessage());
+	        return false;
+	    }
 	}
 
 	/**
@@ -105,18 +122,19 @@ public class UnitServiceImplement  implements UnitService{
 		Optional<UnitEntity> removeUnitEntity = unitRepository.findById(unitId);
 		if(removeUnitEntity.isPresent()) {
 			// Logging to confirm deletion process is reached
-			System.out.println(">>>start>Deleting Unit name: " + removeUnitEntity.get().getUnit_name());
+			logger.info(">>>start>Deleting Unit name: " + removeUnitEntity.get().getUnitName());
+			
 			try {
 				unitRepository.deleteById(unitId);
 			} catch (DataIntegrityViolationException  e) {
 				throw new ConflictException(e.getMessage()); // Re-throwing the exception to preserve the original behavior
 			}catch (Exception e) {
-				throw new RuntimeException(e.getMessage());
+				throw new IllegalArgumentException(e.getMessage());
 			}
-			System.out.println(">end>>>Deleted Unit ID: " + unitId);
+			logger.info(">end>>>Deleted Unit ID: " + unitId);
 			return "The unit " + unitId + " deleted successfully" ;
 		}else {
-			throw new NotFoundException(unitId +" unit Id not Found");
+			throw new NotFoundException(unitId + MSG);
 		}
 	}
 
@@ -130,13 +148,13 @@ public class UnitServiceImplement  implements UnitService{
 	public Unit updateUnit(Unit unit, int unitId) {
 		Optional<UnitEntity> existingUnitEntity = unitRepository.findById(unitId);
 		if (existingUnitEntity.isPresent()) {
-			existingUnitEntity.get().setUnit_name(unit.getUnit_name());
-			existingUnitEntity.get().setUnit_abbreviation(unit.getUnit_abbreviation());
-			existingUnitEntity.get().setUnit_updated_time(unitRepository.findCurrentTimeStamp());
+			existingUnitEntity.get().setUnitName(unit.getUnitName());
+			existingUnitEntity.get().setUnitAbbreviation(unit.getUnitAbbreviation());
+			existingUnitEntity.get().setUnitUpdatedTime(unitRepository.findCurrentTimeStamp());
 			UnitEntity savedUnitEntity = unitRepository.save(existingUnitEntity.get());
 			return convertUnitEntityToUnit(savedUnitEntity);
 		}else {
-			throw new NotFoundException(unitId +" unit Id not Found");
+			throw new NotFoundException(unitId +MSG);
 		}	
 	}
 
@@ -150,9 +168,8 @@ public class UnitServiceImplement  implements UnitService{
 	@Override
 	public Unit getSingleUnit(int unitId) {
 		UnitEntity singleUnitEntity = unitRepository.findById(unitId)
-				.orElseThrow(() ->  new NotFoundException(unitId +" unit Id not Found"));
-		Unit singleUnit = convertUnitEntityToUnit(singleUnitEntity);
-		return singleUnit;
+				.orElseThrow(() ->  new NotFoundException(unitId + MSG));
+		return convertUnitEntityToUnit(singleUnitEntity);
 	}
 
 	/**
@@ -167,7 +184,7 @@ public class UnitServiceImplement  implements UnitService{
 		if (unitEntity == null) {
 			throw new NotFoundException(unitName +" unit name not Found");		
 		}
-		return unitEntity.getUnit_id();		
+		return unitEntity.getUnitId();		
 	}
 
 	/**

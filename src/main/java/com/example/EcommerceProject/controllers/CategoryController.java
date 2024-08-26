@@ -34,9 +34,9 @@ public class CategoryController {
 		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
 	
-	@GetMapping("/public/categories/{category_Id}")
-	public ResponseEntity<Category> getSingleCategoryDetail(@PathVariable Integer category_Id) {
-		Category category = categoryService.getSingleCategory(category_Id);
+	@GetMapping("/public/categories/{categoryId}")
+	public ResponseEntity<Category> getSingleCategoryDetail(@PathVariable Integer categoryId) {
+		Category category = categoryService.getSingleCategory(categoryId);
 		    return new ResponseEntity<>(category, HttpStatus.OK);
 	}
 	
@@ -48,10 +48,10 @@ public class CategoryController {
 		
 	}
 	
-	@DeleteMapping("/public/categories/{category_Id}")
-	public ResponseEntity<String> deleteCategoryDetail(@PathVariable Integer category_Id) {
+	@DeleteMapping("/public/categories/{categoryId}")
+	public ResponseEntity<String> deleteCategoryDetail(@PathVariable Integer categoryId) {
 		try {
-			String categoryStatus = categoryService.deleteCategory(category_Id);
+			String categoryStatus = categoryService.deleteCategory(categoryId);
 		    return new ResponseEntity<>(categoryStatus, HttpStatus.OK);
 		} catch (ResponseStatusException e) {
 			return new ResponseEntity<>(e.getReason(), e.getStatusCode());
@@ -59,11 +59,11 @@ public class CategoryController {
 		
 	}
 	
-	@PutMapping("/public/categories/{categoryt_Id}")
-	public ResponseEntity<String> updateCategoryDetail(@RequestBody Category product, @PathVariable Integer categoryt_Id) {
+	@PutMapping("/public/categories/{categorytId}")
+	public ResponseEntity<String> updateCategoryDetail(@RequestBody Category product, @PathVariable Integer categorytId) {
 		try {
-			Category savedProduct = categoryService.updateCategory(product, categoryt_Id);
-			return new ResponseEntity<>("Category Detail with: " + categoryt_Id + " updated successfully",HttpStatus.OK);
+			categoryService.updateCategory(product, categorytId);
+			return new ResponseEntity<>("Category Detail with: " + categorytId + " updated successfully",HttpStatus.OK);
 		} catch (ResponseStatusException e) {
 			return new ResponseEntity<>(e.getReason(), e.getStatusCode());
 		}

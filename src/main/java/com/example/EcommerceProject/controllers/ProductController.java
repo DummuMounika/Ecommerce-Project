@@ -1,6 +1,7 @@
 package com.example.EcommerceProject.controllers;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,18 +23,32 @@ import com.example.EcommerceProject.services.ProductService;
 @RestController
 public class ProductController {
 	
-	@Autowired
 	private ProductService productService;
 	
+	@Autowired
+	public ProductController(ProductService productService) {
+		this.productService = productService;
+	}
+	
+	Logger logger = Logger.getLogger(getClass().getName());
+
 	/**
 	 * This function help us to retrieve products
 	 * 
 	 * @return {@link List} of Product {@link Product}
 	 */
 	@GetMapping("/public/products")
-	public ResponseEntity<List<Product>> getAllProductDetails() {
-		List<Product> products = productService.getAllProducts();
-		return new ResponseEntity<>(products, HttpStatus.OK);
+	public ResponseEntity<List<Product>> getAllProductDetails(
+			@RequestParam(required = false,value="limit",defaultValue = "0")Integer limit,
+			@RequestParam (required = false,value="offset",defaultValue = "0")Integer offset,
+			@RequestParam (required = false, value="sortBy",defaultValue = "product_id")String sortBy,
+			@RequestParam (required = false, value="sortDir",defaultValue = "DESC")String sortDir) {
+		List<Product> products = productService.getAllProducts(limit, offset, sortBy, sortDir);
+		if (products == null || products.isEmpty()) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Failed to retrieve the products");
+	    }
+	    return new ResponseEntity<>(products, HttpStatus.OK);
+		
 	}
 	
 	/**
@@ -71,10 +87,10 @@ public class ProductController {
 	public ResponseEntity<String> deleteProductDetail(@PathVariable Integer productId) {
 		try {
 			String productStatus = productService.deleteProduct(productId);
-			System.out.println("Deleted Product ID: " + productId);
+			logger.info("Deleted Product ID: " + productId);
 			return new ResponseEntity<>(productStatus, HttpStatus.OK);
 		} catch (NotFoundException e) {
-			System.err.println("Failed to delete Product ID: " + productId + " - " + e.getMessage());
+			logger.info("Failed to delete Product ID: " + productId + " - " + e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		
@@ -91,7 +107,7 @@ public class ProductController {
 			productService.updateProduct(product, productId);
 			return new ResponseEntity<>("Product Detail with: " + productId + " updated successfully",HttpStatus.OK);
 		} catch (NotFoundException e) {
-			System.err.println("Failed to update " + productId + " - " + e.getMessage());
+			logger.info("Failed to update " + productId + " - " + e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		

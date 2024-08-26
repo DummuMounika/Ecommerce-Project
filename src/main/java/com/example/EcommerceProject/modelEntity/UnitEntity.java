@@ -35,44 +35,44 @@ public class UnitEntity {
 	
 	@JsonSerialize(using = JsonTimestampSerializer.class)
 	@Column
-	private Timestamp unit_created_time;
+	private Timestamp unitCreatedTime;
 	
     @JsonSerialize(using = JsonTimestampSerializer.class)
 	@Column
-	private Timestamp unit_updated_time;
+	private Timestamp unitUpdatedTime;
     
     @OneToMany(mappedBy="unitEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<ProductEntity> productsEntities;
 	
-	public int getUnit_id() {
+	public int getUnitId() {
 		return unitId;
 	}
-	public void setUnit_id(int unitId) {
+	public void setUnitId(int unitId) {
 		this.unitId = unitId;
 	}
-	public String getUnit_name() {
+	public String getUnitName() {
 		return unitName;
 	}
-	public void setUnit_name(String unitName) {
+	public void setUnitName(String unitName) {
 		this.unitName = unitName;
 	}
-	public String getUnit_abbreviation() {
+	public String getUnitAbbreviation() {
 		return unitAbbreviation;
 	}
-	public void setUnit_abbreviation(String unitAbbreviation) {
+	public void setUnitAbbreviation(String unitAbbreviation) {
 		this.unitAbbreviation = unitAbbreviation;
 	}
-	public Timestamp getUnit_created_time() {
-		return unit_created_time;
+	public Timestamp getUnitCreatedTime() {
+		return unitCreatedTime;
 	}
-	public void setUnit_created_time(Timestamp unit_created_time) {
-		this.unit_created_time = unit_created_time;
+	public void setUnitCreatedTime(Timestamp unitCreatedTime) {
+		this.unitCreatedTime = unitCreatedTime;
 	}
-	public Timestamp getUnit_updated_time() {
-		return unit_updated_time;
+	public Timestamp getUnitUpdatedTime() {
+		return unitUpdatedTime;
 	}
-	public void setUnit_updated_time(Timestamp unit_updated_time) {
-		this.unit_updated_time = unit_updated_time;
+	public void setUnitUpdatedTime(Timestamp unitUpdatedTime) {
+		this.unitUpdatedTime = unitUpdatedTime;
 	}
 	public List<ProductEntity> getProductsEntities() {
 		return productsEntities;
@@ -83,7 +83,7 @@ public class UnitEntity {
 	@Override
 	public String toString() {
 		return "Unit [unitId=" + unitId + ", unitName=" + unitName + ", unitAbbreviation=" + unitAbbreviation
-				+ ", unit_created_time=" + unit_created_time + ", unit_updated_time=" + unit_updated_time + "]";
+				+ ", unit_created_time=" + unitCreatedTime + ", unit_updated_time=" + unitUpdatedTime + "]";
 	}
 	public UnitEntity( String unitName, String unitAbbreviation) {
 		super();

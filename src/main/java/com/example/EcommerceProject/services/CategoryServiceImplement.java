@@ -3,12 +3,11 @@ package com.example.EcommerceProject.services;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.EcommerceProject.exceptions.NotFoundException;
 import com.example.EcommerceProject.model.Category;
@@ -20,66 +19,70 @@ import com.example.EcommerceProject.repository.CategoryRepository;
 
 @Service
 public class CategoryServiceImplement implements CategoryService {
-	
+
+
+	private CategoryRepository categoryRepository;
+	@Lazy
+	private ProductService productService;
+	Logger logger = Logger.getLogger(getClass().getName());
+	private static final String MSG = "category Id not found";
 	
 	@Autowired
-	private CategoryRepository categoryRepository;
-	
-    @Lazy
-    @Autowired
-    private ProductService productService;
-
+	public CategoryServiceImplement(CategoryRepository categoryRepository, ProductService productService) {
+		super();
+		this.categoryRepository = categoryRepository;
+		this.productService = productService;
+	}
 
 	//convertMethods
 	private Category convertCategoryEntityToCategory(CategoryEntity categoryEntity) {
 		List<ProductEntity> productEntityList = categoryEntity.getProductEntity();
 		List<Product> productList = productService.convertProductEntityListToProductList(productEntityList);
-		return new Category(categoryEntity.getCategory_id(),categoryEntity.getCategory_name(),productList,
-				categoryEntity.getCategory_created_time(),categoryEntity.getCategory_updated_time());
+		return new Category(categoryEntity.getCategoryId(),categoryEntity.getCategoryName(),productList,
+				categoryEntity.getCategoryCreatedTime(),categoryEntity.getCategoryUpdatedTime());
 	}
-	
+
 	private List<Category> convertCategoryEntityListToCategoryList(List<CategoryEntity> categoryEntityList){
-		List<Category> categoryList = new ArrayList<Category>();
+		List<Category> categoryList = new ArrayList<>();
 		for(CategoryEntity categoryEntity: categoryEntityList) {
 			Category category = convertCategoryEntityToCategory(categoryEntity);
 			categoryList.add(category);
 		}
 		return categoryList;
 	}
-	
+
 	private CategoryEntity convertCategorytToCategoryEntity(Category category) {
-	      return new CategoryEntity(category.getCategory_name());
+		return new CategoryEntity(category.getCategoryName());
 	}
-    
+
 	//CRUD Methods
 	@Override
 	public List<Category> getAllCategories() {
 		List<CategoryEntity> categoryEntityList = categoryRepository.findAll();
-	    System.out.println("Cheking the product size: " + categoryEntityList.get(0).getProductEntity().size()); 
-	    List<Category> categoryList = convertCategoryEntityListToCategoryList(categoryEntityList);
-	    return categoryList;
+		logger.info("Cheking the product size: " + categoryEntityList.get(0).getProductEntity().size()); 
+		return convertCategoryEntityListToCategoryList(categoryEntityList);
 	}
 
 	@Override
 	public int createCategory(Category category) {
-		Category existingCategory = findByCategoryName(category.getCategory_name());
-		
+		Category existingCategory = findByCategoryName(category.getCategoryName());
+
 		if (existingCategory == null) {
 			CategoryEntity categoryEntity = convertCategorytToCategoryEntity(category);
 			Timestamp currentTimestamp = categoryRepository.findCurrentTimeStamp();
-			categoryEntity.setCategory_created_time(currentTimestamp);
-			categoryEntity.setCategory_updated_time(currentTimestamp);
+			categoryEntity.setCategoryCreatedTime(currentTimestamp);
+			categoryEntity.setCategoryUpdatedTime(currentTimestamp);
 			CategoryEntity categoryEntityFromDatabase = categoryRepository.save(categoryEntity);
-			return categoryEntityFromDatabase.getCategory_id();
+			return categoryEntityFromDatabase.getCategoryId();
 		}else {
-			return existingCategory.getCategory_id();
+			return existingCategory.getCategoryId();
 		}
 	}
 
 	@Override
 	public String deleteCategory(int categoryId) {
 		CategoryEntity removeCategoryEntity = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new NotFoundException("category Id not found"));
+				.orElseThrow(() -> new NotFoundException(MSG));
 		categoryRepository.delete(removeCategoryEntity);
 		return "The " + categoryId + " deleted successfully" ;
 	}
@@ -87,9 +90,9 @@ public class CategoryServiceImplement implements CategoryService {
 	@Override
 	public Category updateCategory(Category category, int categoryId) {
 		CategoryEntity existingCategoryEntity = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new NotFoundException("category Id not found"));
-		existingCategoryEntity.setCategory_name(category.getCategory_name());
-		existingCategoryEntity.setCategory_updated_time(categoryRepository.findCurrentTimeStamp());
+				.orElseThrow(() -> new NotFoundException(MSG));
+		existingCategoryEntity.setCategoryName(category.getCategoryName());
+		existingCategoryEntity.setCategoryUpdatedTime(categoryRepository.findCurrentTimeStamp());
 		CategoryEntity savedCategoryEntity = categoryRepository.save(existingCategoryEntity);
 		return convertCategoryEntityToCategory(savedCategoryEntity);
 	}
@@ -97,9 +100,8 @@ public class CategoryServiceImplement implements CategoryService {
 	@Override
 	public Category getSingleCategory(int categoryId) {
 		CategoryEntity singleCategoryEntity = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new NotFoundException("category Id not found"));
-	    Category singleCategory = convertCategoryEntityToCategory(singleCategoryEntity);
-	    return singleCategory;
+				.orElseThrow(() -> new NotFoundException(MSG));
+		return convertCategoryEntityToCategory(singleCategoryEntity);
 	}
 
 
@@ -108,13 +110,12 @@ public class CategoryServiceImplement implements CategoryService {
 	public Category findByCategoryName(String categoryName) {
 		CategoryEntity categoryEntity = categoryRepository.findByName(categoryName);
 		if (categoryEntity != null) {
-			Category category = convertCategoryEntityToCategory(categoryEntity);
-			return category;
+			return convertCategoryEntityToCategory(categoryEntity);
 		}else {
 			return null;
 		}
-		
+
 	}
-	
+
 
 }

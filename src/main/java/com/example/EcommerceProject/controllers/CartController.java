@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +21,13 @@ import com.example.EcommerceProject.services.CartService;
 @RestController
 public class CartController {
 	
-	@Autowired
+	
 	private CartService cartService;
+	
+	@Autowired
+	public CartController(CartService cartService) {
+		this.cartService = cartService;
+	}
 	
 	@GetMapping("/public/carts")
 	public ResponseEntity<List<AddToCart>> getAllCarttDetails() {
@@ -42,10 +46,10 @@ public class CartController {
 		}		
 	}
 	
-	@DeleteMapping("/public/carts/{cart_Id}")
-	public ResponseEntity<String> deleteCartDetail(@PathVariable Integer cart_Id) {
+	@DeleteMapping("/public/carts/{cartId}")
+	public ResponseEntity<String> deleteCartDetail(@PathVariable Integer cartId) {
 		try {
-			String cartStatus = cartService.deleteCartDetails(cart_Id);
+			String cartStatus = cartService.deleteCartDetails(cartId);
 		    return new ResponseEntity<>(cartStatus, HttpStatus.OK);
 		} catch (ResponseStatusException e) {
 			return new ResponseEntity<>(e.getReason(), e.getStatusCode());
@@ -53,9 +57,8 @@ public class CartController {
 	}
 	
 	@GetMapping("/public/cartDetails")
-	public ResponseEntity<CartResponse> cartDetails(@RequestParam(value="customerId") Integer customer_id) {
-		System.out.println("Hi");
-		CartResponse cart = cartService.getCartDetails(customer_id);
+	public ResponseEntity<CartResponse> cartDetails(@RequestParam(value="customerId") Integer customerId) {
+		CartResponse cart = cartService.getCartDetails(customerId);
 		return new ResponseEntity<>(cart,HttpStatus.OK);
 	}
 	

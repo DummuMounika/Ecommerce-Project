@@ -1,7 +1,7 @@
 package com.example.EcommerceProject.services;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.EcommerceProject.model.Product;
 import com.example.EcommerceProject.modelEntity.ProductEntity;
@@ -9,11 +9,14 @@ import com.example.EcommerceProject.modelEntity.ProductEntity;
 
 public interface ProductService {
 	
-	public List<Product> getAllProducts();
+	public List<Product> getAllProducts(int limit, int offset, String sortBy, String sortDirection);
 	public boolean createProduct(Product product);
-	public String deleteProduct(int product_Id);
-	public Product updateProduct(Product product, int product_Id);
-	public Product getSingleProduct(int product_Id);
+	public String deleteProduct(int productId);
+	public Product updateProduct(Product product, int productId);
+	public Product getSingleProduct(int productId);
 	public List<Product> convertProductEntityListToProductList(List<ProductEntity> productEntityList);
-    public HashMap<Integer, Product> getMultipleProducts(List<Integer> productIds);
+    public Map<Integer, Product> getMultipleProducts(List<Integer> productIds);
+    
+    
+    
 }

@@ -2,49 +2,51 @@ package com.example.EcommerceProject.services;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.EcommerceProject.exceptions.NotFoundException;
 import com.example.EcommerceProject.model.AddToCart;
-import com.example.EcommerceProject.model.CartResponse;
 import com.example.EcommerceProject.model.CartProduct;
+import com.example.EcommerceProject.model.CartResponse;
 import com.example.EcommerceProject.model.Customer;
 import com.example.EcommerceProject.model.Product;
 import com.example.EcommerceProject.modelEntity.AddToCartEntity;
-import com.example.EcommerceProject.modelEntity.ProductEntity;
 import com.example.EcommerceProject.repository.CartRepository;
-import com.example.EcommerceProject.repository.ProductRepository;
 
 @Service
 public class CartServiceImplement  implements CartService{
 
-	@Autowired
 	private CartRepository cartRepository;
-
-	@Autowired
 	private ProductService productService;
-
-	@Autowired
 	private CustomerService customerService;
-
+	Logger logger = Logger.getLogger(getClass().getName());
+	
+	@Autowired
+	public CartServiceImplement(CartRepository cartRepository, ProductService productService,
+			CustomerService customerService) {
+		super();
+		this.cartRepository = cartRepository;
+		this.productService = productService;
+		this.customerService = customerService;
+	}
 
 	//convertMethods
 	private AddToCart convertCartEntityToCart(AddToCartEntity addToCartEntity) {
-		return new AddToCart(addToCartEntity.getCart_id(),addToCartEntity.getCustomer_id(),
-				addToCartEntity.getProduct_id(),addToCartEntity.getQuantity(),addToCartEntity.getUnit_price(),
-				addToCartEntity.getCart_created_time(),addToCartEntity.getCart_updated_time());
+		return new AddToCart(addToCartEntity.getCartId(),addToCartEntity.getCustomerId(),
+				addToCartEntity.getProductId(),addToCartEntity.getQuantity(),addToCartEntity.getUnitPrice(),
+				addToCartEntity.getCartCreatedTime(),addToCartEntity.getCartUpdatedTime());
 	}
 
 	private List<AddToCart> convertCartEntityListToCartList(List<AddToCartEntity> addToCartEntityList){
-		List<AddToCart> addToCartList = new ArrayList<AddToCart>();
+		List<AddToCart> addToCartList = new ArrayList<>();
 		for(AddToCartEntity addToCartEntity: addToCartEntityList) {
 			AddToCart addToCart = convertCartEntityToCart(addToCartEntity);
 			addToCartList.add(addToCart);
@@ -53,14 +55,14 @@ public class CartServiceImplement  implements CartService{
 	}
 
 	private AddToCartEntity convertAddToCartToAddToCartEntity(AddToCart addToCart) {
-		return new AddToCartEntity(addToCart.getCustomer_id(),addToCart.getProduct_id(),
-				addToCart.getQuantity(),addToCart.getUnit_price());
+		return new AddToCartEntity(addToCart.getCustomerId(),addToCart.getProductId(),
+				addToCart.getQuantity(),addToCart.getUnitPrice());
 	}
 
 	private void validateCartDetails(AddToCart addToCart, Product productEntity) {
 
 		// Logic to check customer Id existence
-		Customer customerEntity = customerService.getSingleCustomerInfo(addToCart.getCustomer_id());
+		Customer customerEntity = customerService.getSingleCustomerInfo(addToCart.getCustomerId());
 		if (customerEntity == null) {
 			throw new NotFoundException("Customer Id not Found");
 		}
@@ -75,8 +77,8 @@ public class CartServiceImplement  implements CartService{
 
 		// Logic to check product quantity presence
 		int enteredQuantity = addToCart.getQuantity();
-		int presentProductStock = productEntity.getProduct_stock_quantity();
-		double productPrice = productEntity.getProduct_price();
+		int presentProductStock = productEntity.getProductStockQuantity();
+		double productPrice = productEntity.getProductPrice();
 
 		if (enteredQuantity > presentProductStock) {
 			throw new NotFoundException("Unable to add the requested quantity to the cart. Only " + presentProductStock + " items are currently in stock.");
@@ -89,8 +91,7 @@ public class CartServiceImplement  implements CartService{
 	@Override
 	public List<AddToCart> getAllCartDetails() {
 		List<AddToCartEntity> addToCartEntityList = cartRepository.findAll();
-		List<AddToCart> addToCartList = convertCartEntityListToCartList(addToCartEntityList);
-		return addToCartList;	
+		return convertCartEntityListToCartList(addToCartEntityList);
 	}
 
 
@@ -104,39 +105,41 @@ public class CartServiceImplement  implements CartService{
 
 	@Override
 	public boolean addCart(AddToCart addToCart) {
-		// Validate and calculate cart details
-		Product productEntity = productService.getSingleProduct(addToCart.getProduct_id());
-		validateCartDetails(addToCart, productEntity);
-		double unitPrice  = calculateCartDetails(addToCart, productEntity);
-		addToCart.setUnit_price(unitPrice);
+	    try {
+	        // Validate and calculate cart details
+	        Product productEntity = productService.getSingleProduct(addToCart.getProductId());
+	        validateCartDetails(addToCart, productEntity);
+	        double unitPrice = calculateCartDetails(addToCart, productEntity);
+	        addToCart.setUnitPrice(unitPrice);
 
-		// Fetch current timestamp
-		Timestamp currentTimestamp = cartRepository.findCurrentTimeStamp();
+	        // Fetch current timestamp
+	        Timestamp currentTimestamp = cartRepository.findCurrentTimeStamp();
 
-		// Check if the product is already in the cart
-		Optional<AddToCartEntity> productInCartOpt = cartRepository.findByCustomerIdAndProductId(
-				addToCart.getCustomer_id(), addToCart.getProduct_id());
+	        // Check if the product is already in the cart
+	        Optional<AddToCartEntity> productInCartOpt = cartRepository.findByCustomerIdAndProductId(
+	                addToCart.getCustomerId(), addToCart.getProductId());
 
-		AddToCartEntity entity = null;
-		if (productInCartOpt.isPresent()) {
-			// If the product is already in the cart, update quantity and price
-			AddToCartEntity existingCart = productInCartOpt.get();
-			existingCart.setQuantity(addToCart.getQuantity());
-			existingCart.setUnit_price(addToCart.getUnit_price());
-			existingCart.setCart_updated_time(currentTimestamp);
-			entity = cartRepository.save(existingCart);
-		} else {
-			// If the product is new, add it with the same cart_id
-			AddToCartEntity newCartEntity = convertAddToCartToAddToCartEntity(addToCart);
-			newCartEntity.setCart_created_time(currentTimestamp);
-			newCartEntity.setCart_updated_time(currentTimestamp);
-			entity = cartRepository.save(newCartEntity);
-		}
-		if (entity == null) {
-			return false;
-		}else {
-			return true;
-		}	
+	        if (productInCartOpt.isPresent()) {
+	            // Update quantity, price, and timestamp for the existing product
+	            AddToCartEntity existingCart = productInCartOpt.get();
+	            existingCart.setQuantity(addToCart.getQuantity());
+	            existingCart.setUnitPrice(addToCart.getUnitPrice());
+	            existingCart.setCartUpdatedTime(currentTimestamp);
+	            cartRepository.save(existingCart);
+	        } else {
+	            // Add new product to the cart with timestamps
+	            AddToCartEntity newCartEntity = convertAddToCartToAddToCartEntity(addToCart);
+	            newCartEntity.setCartCreatedTime(currentTimestamp);
+	            newCartEntity.setCartUpdatedTime(currentTimestamp);
+	            cartRepository.save(newCartEntity);
+	        }
+
+	        return true;
+	    } catch (Exception e) {
+	        // Log the exception
+	        logger.severe("Failed to add/update cart: " + e.getMessage());
+	        return false;
+	    }
 	}
 
 
@@ -152,30 +155,30 @@ public class CartServiceImplement  implements CartService{
 		List<CartProduct> cartProducts = new ArrayList<>();
 		double totalPrice = 0;
 
-		List<Integer> productIds =  new ArrayList<Integer>();
+		List<Integer> productIds =  new ArrayList<>();
 		for (AddToCartEntity cartEntity: cartEntities) {
-			productIds.add(cartEntity.getProduct_id());
+			productIds.add(cartEntity.getProductId());
 		}
 		
 
-		HashMap<Integer, Product> productMap = productService.getMultipleProducts(productIds);
+		Map<Integer, Product> productMap = productService.getMultipleProducts(productIds);
 
 		for (AddToCartEntity cartEntity : cartEntities) {
 			AddToCart cart = convertCartEntityToCart(cartEntity);
 
-			Product product = productMap.get(cartEntity.getProduct_id());
+			Product product = productMap.get(cartEntity.getProductId());
 
 			CartProduct cartProduct = new CartProduct(
-					product.getProduct_id(),
-					product.getProduct_name(),
-					product.getProduct_price(),
+					product.getProductId(),
+					product.getProductName(),
+					product.getProductPrice(),
 					cartEntity.getQuantity());
 
 			checkOutStatus(cart, cartProduct, product);
 			cartProducts.add(cartProduct);
 			totalPrice += cartProduct.getProductUnitPrice();
 		}
-		if(cartProducts.size()==0)
+		if(cartProducts.isEmpty())
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please, add products in the cart");
 		else
 			return new CartResponse(cartProducts, totalPrice);

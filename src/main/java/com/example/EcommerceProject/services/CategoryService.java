@@ -9,8 +9,8 @@ public interface CategoryService {
 	public List<Category> getAllCategories();
 	public int createCategory(Category category);
 	public String deleteCategory(int categoryId);
-	public Category updateCategory(Category category, int category_Id);
-	public Category getSingleCategory(int category_Id);
+	public Category updateCategory(Category category, int categoryId);
+	public Category getSingleCategory(int categoryId);
 	public Category findByCategoryName(String categoryName);
 	
 }

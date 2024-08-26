@@ -35,14 +35,5 @@ public class CartResponse {
 		super();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }

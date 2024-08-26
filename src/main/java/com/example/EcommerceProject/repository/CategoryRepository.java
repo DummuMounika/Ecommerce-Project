@@ -13,5 +13,5 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Intege
 	Timestamp findCurrentTimeStamp();
 	
     @Query("SELECT categoryE FROM CategoryEntity categoryE WHERE categoryE.category_name = ?1")   
-	CategoryEntity findByName(String category_name);
+	CategoryEntity findByName(String categoryName);
 }
