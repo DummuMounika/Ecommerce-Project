@@ -16,6 +16,7 @@ import com.example.ecommerce.project.model.Unit;
 import com.example.ecommerce.project.model.entity.UnitEntity;
 import com.example.ecommerce.project.repository.UnitRepository;
 
+
 @Service
 public class UnitServiceImplement  implements UnitService{
 
@@ -40,7 +41,8 @@ public class UnitServiceImplement  implements UnitService{
 	 * @param productEntity {@link UnitEntity}
 	 * @return product {@link Unit}
 	 */
-	private Unit convertUnitEntityToUnit(UnitEntity unitEntity) {
+	@Override
+	public Unit convertUnitEntityToUnit(UnitEntity unitEntity) {
 		return new Unit(unitEntity.getUnitId(),unitEntity.getUnitName(),unitEntity.getUnitAbbreviation(),
 				unitEntity.getUnitCreatedTime(),unitEntity.getUnitUpdatedTime());
 	}

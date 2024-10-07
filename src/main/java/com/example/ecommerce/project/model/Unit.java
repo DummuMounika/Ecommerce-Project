@@ -67,6 +67,11 @@ public class Unit {
 	public Unit() {
 		
 	}
+	public Unit(int unitId, String unitName, String unitAbbreviation) {
+		this.unitId = unitId;
+		this.unitName = unitName;
+		this.unitAbbreviation = unitAbbreviation;
+	}
 	
 	
 	

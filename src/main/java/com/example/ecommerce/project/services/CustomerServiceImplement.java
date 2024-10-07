@@ -8,12 +8,15 @@ import java.util.logging.Logger;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.ecommerce.project.exceptions.CustomerNotFoundException;
 import com.example.ecommerce.project.exceptions.NotFoundException;
 import com.example.ecommerce.project.model.Customer;
+import com.example.ecommerce.project.model.EmailDetails;
 import com.example.ecommerce.project.model.entity.CustomerEntity;
 import com.example.ecommerce.project.repository.CustomerRepository;
 
@@ -22,15 +25,15 @@ public class CustomerServiceImplement implements CustomerService {
 
 	
 	private CustomerRepository customerRepository;
-	//private PasswordEncoder passwordEncoder;
+	private EmailService emailService;
+	
 	
 	Logger logger = Logger.getLogger(getClass().getName());
 
 	@Autowired
-	public CustomerServiceImplement(CustomerRepository customerRepository) {
-			//PasswordEncoder passwordEncoder) {
+	public CustomerServiceImplement(CustomerRepository customerRepository,EmailService emailService ) {
 		super();
-		//this.passwordEncoder = passwordEncoder;
+		this.emailService = emailService;
 		this.customerRepository = customerRepository;
 	}
 
@@ -68,6 +71,12 @@ public class CustomerServiceImplement implements CustomerService {
 
 	@Override
 	public boolean addCustomerInfo(Customer customer) {
+		Optional<CustomerEntity> existingCustomerEntity = customerRepository.findBycustomerEmail(customer.getCustomerEmail());
+
+		if (!existingCustomerEntity.isEmpty()) {
+			throw new NotFoundException("Email already exists"); //Todo change and403  add related exception and add in global
+		}
+
 	 try {
 	        // Convert Customer to CustomerEntity
 	        CustomerEntity customerEntity = convertCustomerToCustomerEntity(customer);
@@ -81,16 +90,32 @@ public class CustomerServiceImplement implements CustomerService {
 	        customerEntity.setCustomerUpdatedTime(currentTimestamp);
 	        
 	        // Save the entity
-	        customerRepository.save(customerEntity);
-	        return true;
-	    } catch (Exception e) {
+	        CustomerEntity savedCustomer = customerRepository.save(customerEntity);
+	        if(savedCustomer.getCustomerEmail().equals(customer.getCustomerEmail())) {
+	        	//send email to customer 
+	        	String messageBody = "Hello " + customer.getCustomerFirstName() +" "+ customer.getCustomerLastName() + ", \n  Welcome to ecommerce website";
+	        	String subject = "Welcome Email";
+	        	EmailDetails emailDetails = new EmailDetails(customer.getCustomerEmail(), messageBody, subject, null, false);
+	        	//CompletableFuture.runAsync(() -> {
+	        		emailService.sendEmail(emailDetails);
+	        	//});
+	        	return true;
+	        	
+	        }else {
+	        	return false;
+	        }
+	    } catch (IllegalArgumentException e) {
 	        // Log the exception
 	        logger.severe("Failed to add customer info: " + e.getMessage());
 	        return false;
+	    } catch (Exception e) {
+	    	 logger.severe("Failed to add customer error: " + e.getMessage());
+		    return false;
 	    }
 	}
 
 	@Override
+	//@CacheEvict(value = "customers" , allEntries = true)
 	public String deleteCustomerInfo(int customerId) {
 		CustomerEntity removeCustomerEntity = customerRepository.findById(customerId)
 				.orElseThrow(() -> new CustomerNotFoundException("customer Id not found"));
@@ -99,6 +124,7 @@ public class CustomerServiceImplement implements CustomerService {
 	}
 
 	@Override
+	@CachePut(value = "customers", key = "#customerId")
 	public Customer updateCustomerInfo(Customer customer, int customerId) {
 	    CustomerEntity existingCustomerEntity = customerRepository.findById(customerId)
 	            .orElseThrow(() -> new CustomerNotFoundException("Customer not found with the given ID."));
@@ -125,6 +151,7 @@ public class CustomerServiceImplement implements CustomerService {
 		
 
 	@Override
+	@Cacheable(value = "customers", key = "#customerId")
 	public Customer getSingleCustomerInfo(int customerId) {
 		CustomerEntity getSingleCustomer = customerRepository.findById(customerId)
 				.orElseThrow(() -> new CustomerNotFoundException("customer not found with the given ID."));

@@ -1,12 +1,17 @@
 package com.example.ecommerce.project.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import com.example.ecommerce.project.utils.JsonTimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class Customer {
+public class Customer  implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int customerId;
 	private String customerFirstName;
 	private String customerLastName;

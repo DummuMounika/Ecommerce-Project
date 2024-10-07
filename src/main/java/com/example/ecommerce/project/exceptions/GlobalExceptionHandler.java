@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler({CustomerExistsException.class})
 	public ResponseEntity<Object> handleCustomerAlreadyExistsException(CustomerExistsException exception){
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
 	}
 	
 	@ExceptionHandler({NotFoundException.class})

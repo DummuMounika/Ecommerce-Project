@@ -24,7 +24,7 @@ public class JwtHelper {
 	 private SecretKey secretkey;
 	 
 	 //Required for token validity as of now 5 miliseconds
-	 public static final long JWT_TOKEN_VALIDITY = 3 * 60 ;
+	 public static final long JWT_TOKEN_VALIDITY = 20 * 60 ;
 	
 	 @PostConstruct
 	 public void generateNewScretKey() {

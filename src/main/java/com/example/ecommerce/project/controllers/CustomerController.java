@@ -7,6 +7,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ecommerce.project.jwt.security.JwtHelper;
 import com.example.ecommerce.project.model.Customer;
-import com.example.ecommerce.project.model.JwtRequest;
 import com.example.ecommerce.project.model.JwtResponse;
 import com.example.ecommerce.project.services.CustomerService;
 
@@ -60,13 +61,13 @@ public class CustomerController {
 	
 
 	@GetMapping("/public/customers/{customerId}")
+	//@Cacheable(value = "customers", key = "#customerId")
 	public ResponseEntity<Customer> getSingleCustomerDetail(@PathVariable Integer customerId) {
 		Customer customer = customerService.getSingleCustomerInfo(customerId);
 		return new ResponseEntity<>(customer, HttpStatus.OK);
 	}
 	
 
-	//@PostMapping("/public/customers")
 	@PostMapping("/customers")
 	public ResponseEntity<String> createCustomer(@RequestBody Customer customer) {
 		boolean isCreated = customerService.addCustomerInfo(customer);
@@ -79,12 +80,14 @@ public class CustomerController {
 	}
 	
 	@DeleteMapping("/public/customers/{customerId}")
+	@CacheEvict(value = "customers" , allEntries = true)
 	public ResponseEntity<String> deleteCustomerDetail(@PathVariable Integer customerId) {
 		String customerStatus = customerService.deleteCustomerInfo(customerId);
 	    return new ResponseEntity<>(customerStatus, HttpStatus.OK);
 	}
 	
 	@PutMapping("public/customers/{customerId}")
+	//@CachePut(value = "customers", key = "#customerId")
 	public ResponseEntity<String> updateCustomerDetail(@RequestBody Customer customer, @PathVariable Integer customerId) {
 		customerService.updateCustomerInfo(customer, customerId);
 		return new ResponseEntity<>("Customer Detail with: " + customerId + " updated successfully",HttpStatus.OK);
@@ -115,38 +118,19 @@ public class CustomerController {
 		return principal.getName();
 	}
 	
-	//JWT Authentication
-	
-//	 @PostMapping("/auth/login")
-//    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
-//        
-//    	 // Authenticate the user
-//        this.doAuthenticate(request.getEmail(), request.getPassword());
-//        // Load user details
-//        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-//        String token = this.helper.generateToken(userDetails);
-//        Timestamp expiredTime = this.helper.getExpirationDateFromToken(token);
-//
-//        JwtResponse response = JwtResponse.builder()
-//                .jwtToken(token)
-//                .username(userDetails.getUsername())
-//                .expiredTime(expiredTime)
-//                .build();
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
-//
-	    private void doAuthenticate(String email, String password) {
 
-	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
-	        try {
-	            manager.authenticate(authentication);
+    private void doAuthenticate(String email, String password) {
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
+        try {
+            manager.authenticate(authentication);
 
 
-	        } catch (BadCredentialsException e) {
-	            throw new BadCredentialsException(" Invalid Username or Password  !!");
-	        }
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException(" Invalid Username or Password  !!");
+        }
 
-	    }
+    }
 
 	    
 

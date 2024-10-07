@@ -1,5 +1,7 @@
 package com.example.ecommerce.project.model.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.ecommerce.project.utils.JsonTimestampSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import jakarta.persistence.Column;
@@ -19,8 +22,11 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="customers")
-public class CustomerEntity implements UserDetails {
+public class CustomerEntity implements UserDetails , Serializable {
 	
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int customerId;
@@ -35,6 +41,7 @@ public class CustomerEntity implements UserDetails {
 	private String customerEmail;
 	
 	@Column
+	//@JsonIgnore
 	private String customerPassword;
 	
 	@Column

@@ -3,6 +3,9 @@ package com.example.ecommerce.project.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +38,7 @@ public class CategoryController {
 	}
 	
 	@GetMapping("/public/categories/{categoryId}")
+	@Cacheable(value = "Category" , key = "#id")
 	public ResponseEntity<Category> getSingleCategoryDetail(@PathVariable Integer categoryId) {
 		Category category = categoryService.getSingleCategory(categoryId);
 		    return new ResponseEntity<>(category, HttpStatus.OK);
@@ -49,6 +53,7 @@ public class CategoryController {
 	}
 	
 	@DeleteMapping("/public/categories/{categoryId}")
+	//@CacheEvict(cacheNames = "Customer" , key = "#id" , beforeInvocation = true)
 	public ResponseEntity<String> deleteCategoryDetail(@PathVariable Integer categoryId) {
 		try {
 			String categoryStatus = categoryService.deleteCategory(categoryId);
@@ -60,6 +65,7 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/public/categories/{categorytId}")
+	@CachePut(cacheNames = "Customer" , key = "#id")
 	public ResponseEntity<String> updateCategoryDetail(@RequestBody Category product, @PathVariable Integer categorytId) {
 		try {
 			categoryService.updateCategory(product, categorytId);
