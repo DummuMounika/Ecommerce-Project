@@ -1,7 +1,7 @@
 <h1>EcommerceProject</h1>
 
 <h3>Description</h3>
-This demo project was built with Spring Boot, demonstrating a basic e-commerce application with several functionalities like user management, product management, and cart handling. 
+This monolithic project was built with Spring Boot, demonstrating a basic e-commerce application with several functionalities like user management, product management, and cart handling. 
 The project includes various dependencies that enhance the application's performance, security, and functionality.
 
 <h3>Features</h3>
